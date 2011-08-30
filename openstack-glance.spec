@@ -65,7 +65,7 @@ Group:            Documentation
 
 Requires:         %{name} = %{version}-%{release}
 
-BuildRequires:    python-sphinx
+BuildRequires:    python-sphinx10
 BuildRequires:    graphviz
 
 # Required to build module documents
@@ -101,7 +101,7 @@ rm -fr %{buildroot}%{python_sitelib}/tests
 
 export PYTHONPATH="$( pwd ):$PYTHONPATH"
 pushd doc
-sphinx-build -b html source build/html
+sphinx-1.0-build -b html source build/html
 popd
 
 # Fix hidden-file-or-dir warnings
