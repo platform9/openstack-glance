@@ -8,7 +8,7 @@ Summary:          OpenStack Image Service
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          http://launchpad.net/nova/diablo/2011.3/+download/glance-%{version}.tar.gz
+Source0:          http://launchpad.net/glance/diablo/2011.3/+download/glance-%{version}.tar.gz
 Source1:          openstack-glance-api.init
 Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
