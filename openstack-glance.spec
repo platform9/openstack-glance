@@ -2,13 +2,13 @@
 
 Name:             openstack-glance
 Version:          2011.3
-Release:          0.5.%{milestone}%{dist}
+Release:          1%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          http://launchpad.net/glance/diablo/diablo-4/+download/glance-%{version}~%{milestone}.tar.gz
+Source0:          http://launchpad.net/glance/diablo/diablo-4/+download/glance-%{version}.tar.gz
 Source1:          openstack-glance-api.init
 Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
@@ -177,6 +177,10 @@ fi
 %doc doc/build/html
 
 %changelog
+
+* Fri Oct 21 2011 David Busby <oneiroi@fedoraproject.org> - 2011.3-1
+- Update to Diablo Final 
+
 * Fri Aug 26 2011 Mark McLoughlin <markmc@redhat.com> - 2011.3-0.5.d4
 - Update to diablo4 milestone
 - Add logrotate config (#732691)
