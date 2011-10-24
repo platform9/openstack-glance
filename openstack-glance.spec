@@ -1,4 +1,3 @@
-%global milestone d4
 
 Name:             openstack-glance
 Version:          2011.3
@@ -8,7 +7,7 @@ Summary:          OpenStack Image Service
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          http://launchpad.net/glance/diablo/2011.3/+download/glance-%{version}.tar.gz
+Source0:          http://launchpad.net/glance/diablo/%{version}/+download/glance-%{version}.tar.gz
 Source1:          openstack-glance-api.init
 Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
@@ -16,6 +15,8 @@ Source3:          openstack-glance.logrotate
 BuildArch:        noarch
 BuildRequires:    python2-devel
 BuildRequires:    python-setuptools
+BuildRequires:    python-distutils-extra
+BuildRequires:    intltool
 
 Requires(post):   chkconfig
 Requires(preun):  initscripts
@@ -86,7 +87,7 @@ This package contains documentation files for glance.
 %prep
 %setup -q -n glance-%{version}
 
-sed -i 's|\(sql_connection = sqlite://\)\(/glance.sqlite\)|\1%{_sharedstatedir}/glance\2|' etc/glance-registry.conf
+sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
 
 sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/registry/db/migrate_repo/manage.py
 
@@ -102,10 +103,17 @@ rm -fr %{buildroot}%{python_sitelib}/tests
 export PYTHONPATH="$( pwd ):$PYTHONPATH"
 pushd doc
 sphinx-1.0-build -b html source build/html
+sphinx-1.0-build -b man source build/man
+
+mkdir -p %{buildroot}%{_mandir}/man1
+install -p -D -m 644 build/man/*.1 %{buildroot}%{_mandir}/man1/
 popd
 
 # Fix hidden-file-or-dir warnings
 rm -fr doc/build/html/.doctrees doc/build/html/.buildinfo
+rm -f %{buildroot}%{_sysconfdir}/glance*.conf
+rm -f %{buildroot}%{_sysconfdir}/logging.cnf.sample
+rm -f %{buildroot}/usr/share/doc/glance/README
 
 # Setup directories
 install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
@@ -160,6 +168,7 @@ fi
 %{_bindir}/glance-scrubber
 %{_initrddir}/openstack-glance-api
 %{_initrddir}/openstack-glance-registry
+%{_mandir}/man1/glance-*.1.gz
 %dir %{_sysconfdir}/glance
 %config(noreplace) %{_sysconfdir}/glance/glance-api.conf
 %config(noreplace) %{_sysconfdir}/glance/glance-registry.conf
@@ -177,9 +186,24 @@ fi
 %doc doc/build/html
 
 %changelog
-
 * Fri Oct 21 2011 David Busby <oneiroi@fedoraproject.org> - 2011.3-1
-- Update to Diablo Final 
+- Update to Diablo Final
+
+* Tue Sep 27 2011 Mark McLoughlin <markmc@redhat.com> - 2011.3-1
+- Update to Diablo final
+
+* Tue Sep  6 2011 Mark McLoughlin <markmc@redhat.com> - 2011.3-0.8.d4
+- fix DB path in config
+- add BR: intltool for distutils-extra
+
+* Wed Aug 31 2011 Angus Salkeld <asalkeld@redhat.com> - 2011.3-0.7.d4
+- Use the available man pages
+- don't make service files executable
+- delete unused files
+- add BR: python-distutils-extra (#733610)
+
+* Tue Aug 30 2011 Angus Salkeld <asalkeld@redhat.com> - 2011.3-0.6.d4
+- Change from LSB scripts to systemd service files (#732689).
 
 * Fri Aug 26 2011 Mark McLoughlin <markmc@redhat.com> - 2011.3-0.5.d4
 - Update to diablo4 milestone
