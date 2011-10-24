@@ -18,9 +18,9 @@ BuildRequires:    python-setuptools
 BuildRequires:    python-distutils-extra
 BuildRequires:    intltool
 
-Requires(post):   systemd-units
-Requires(preun):  systemd-units
-Requires(postun): systemd-units
+Requires(post):   chkconfig
+Requires(preun):  initscripts
+Requires(preun):  chkconfig
 Requires(pre):    shadow-utils
 Requires:         python-glance = %{version}-%{release}
 
@@ -123,8 +123,8 @@ install -p -D -m 644 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glanc
 install -p -D -m 644 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
 
 # Initscripts
-install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/openstack-glance-api.service
-install -p -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/openstack-glance-registry.service
+install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/openstack-glance-api
+install -p -D -m 755 %{SOURCE2} %{buildroot}%{_initrddir}/openstack-glance-registry
 
 # Logrotate config
 install -p -D -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/openstack-glance
@@ -143,27 +143,15 @@ useradd -u 161 -r -g glance -d %{_sharedstatedir}/glance -s /sbin/nologin \
 exit 0
 
 %post
-if [ $1 -eq 1 ] ; then
-    # Initial installation
-    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
-fi
-
+/sbin/chkconfig --add openstack-glance-api
+/sbin/chkconfig --add openstack-glance-registry
 
 %preun
-if [ $1 -eq 0 ] ; then
-    # Package removal, not upgrade
-    /bin/systemctl --no-reload disable openstack-glance-api.service > /dev/null 2>&1 || :
-    /bin/systemctl --no-reload disable openstack-glance-registry.service > /dev/null 2>&1 || :
-    /bin/systemctl stop openstack-glance-api.service > /dev/null 2>&1 || :
-    /bin/systemctl stop openstack-glance-registry.service > /dev/null 2>&1 || :
-fi
-
-%postun
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-    # Package upgrade, not uninstall
-    /bin/systemctl try-restart openstack-glance-api.service >/dev/null 2>&1 || :
-    /bin/systemctl try-restart openstack-glance-registry.service >/dev/null 2>&1 || :
+if [ $1 = 0 ] ; then
+    /sbin/service openstack-glance-api stop >/dev/null 2>&1
+    /sbin/chkconfig --del openstack-glance-api
+    /sbin/service openstack-glance-registry stop >/dev/null 2>&1
+    /sbin/chkconfig --del openstack-glance-registry
 fi
 
 %files
