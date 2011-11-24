@@ -1,0 +1,32 @@
+Delve into pkg_resources a little to get it to modify sys.path,
+so that our parallel installed egg takes precedence over the
+system default module versions.
+
+--- glance-2011.3.orig/glance/__init__.py	2011-09-21 21:46:35.000000000 +0100
++++ glance-2011.3/glance/__init__.py	2011-11-22 14:49:33.454505203 +0000
+@@ -14,3 +14,25 @@
+ #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ #    License for the specific language governing permissions and limitations
+ #    under the License.
++
++import sys
++import pkg_resources
++
++# If there is a conflicting non egg module,
++# i.e. an older standard system module installed,
++# then replace it with this requirement
++def replace_dist(requirement):
++    try:
++        return pkg_resources.require(requirement)
++    except pkg_resources.VersionConflict:
++        e = sys.exc_info()[1]
++        dist=e.args[0]
++        req=e.args[1]
++        if dist.key == req.key and not dist.location.endswith('.egg'):
++            del pkg_resources.working_set.by_key[dist.key]
++            # We assume there is no need to adjust sys.path
++            # and the associated pkg_resources.working_set.entries
++            return pkg_resources.require(requirement)
++
++print replace_dist("SQLALchemy >= 0.6.3")
++print replace_dist("WebOb >= 1.0")

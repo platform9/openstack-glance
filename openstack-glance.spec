@@ -13,6 +13,7 @@ Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
 Patch0:           openstack-glance-docmod.patch
 Patch1:           openstack-glance-nonet.patch
+Patch2:           openstack-glance-newdeps.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -44,8 +45,9 @@ Group:            Applications/System
 Requires:         python-eventlet
 Requires:         python-kombu
 Requires:         python-routes
-Requires:         python-sqlalchemy
-Requires:         python-webob
+Requires:         python-sqlalchemy0.7
+Requires:         python-webob1.0
+Requires:         python-setuptools
 
 #
 # The image cache requires this http://pypi.python.org/pypi/xattr
@@ -77,8 +79,8 @@ BuildRequires:    python-daemon
 BuildRequires:    python-eventlet
 BuildRequires:    python-gflags
 BuildRequires:    python-routes
-BuildRequires:    python-sqlalchemy
-BuildRequires:    python-webob
+BuildRequires:    python-sqlalchemy0.7
+BuildRequires:    python-webob1.0
 
 %description      doc
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -90,6 +92,7 @@ This package contains documentation files for glance.
 %setup -q -n glance-%{version}
 %patch0 -p1 -b .docmod
 %patch1 -p1 -b .nonet
+%patch2 -p1 -b .newdeps
 
 sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
 
@@ -190,6 +193,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Nov 22 2011 Pádraig Brady <P@draigBrady.com> - 2011.3-3
+- Use updated parallel install versions of epel packages
+
 * Tue Nov 22 2011 Pádraig Brady <P@draigBrady.com> - 2011.3-2
 - Ensure the docs aren't built with the system glance module
 - Ensure we don't access the net when building docs
