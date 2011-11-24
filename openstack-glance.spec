@@ -1,7 +1,7 @@
 
 Name:             openstack-glance
 Version:          2011.3
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -11,6 +11,8 @@ Source0:          http://launchpad.net/glance/diablo/%{version}/+download/glance
 Source1:          openstack-glance-api.init
 Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
+Patch0:           openstack-glance-docmod.patch
+Patch1:           openstack-glance-nonet.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -86,6 +88,8 @@ This package contains documentation files for glance.
 
 %prep
 %setup -q -n glance-%{version}
+%patch0 -p1 -b .docmod
+%patch1 -p1 -b .nonet
 
 sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
 
@@ -186,6 +190,10 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Nov 22 2011 Pádraig Brady <P@draigBrady.com> - 2011.3-2
+- Ensure the docs aren't built with the system glance module
+- Ensure we don't access the net when building docs
+
 * Fri Oct 21 2011 David Busby <oneiroi@fedoraproject.org> - 2011.3-1
 - Update to Diablo Final
 
