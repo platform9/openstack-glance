@@ -28,5 +28,5 @@ system default module versions.
 +            # and the associated pkg_resources.working_set.entries
 +            return pkg_resources.require(requirement)
 +
-+print replace_dist("SQLALchemy >= 0.6.3")
-+print replace_dist("WebOb >= 1.0")
++replace_dist("SQLALchemy >= 0.6.3")
++replace_dist("WebOb >= 1.0")
