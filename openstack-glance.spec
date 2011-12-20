@@ -1,7 +1,7 @@
 
 Name:             openstack-glance
 Version:          2011.3
-Release:          3%{?dist}
+Release:          4%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -49,6 +49,7 @@ Requires:         python-routes
 Requires:         python-sqlalchemy0.7
 Requires:         python-webob1.0
 Requires:         python-setuptools
+Requires:         python-httplib2
 
 #
 # The image cache requires this http://pypi.python.org/pypi/xattr
@@ -194,6 +195,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Dec 20 2011 David Busby <oneiroi@fedoraproject.org> - 2011.3-4
+- Depend on python-httplib2
+
 * Tue Nov 22 2011 Pádraig Brady <P@draigBrady.com> - 2011.3-3
 - Use updated parallel install versions of epel packages
 
