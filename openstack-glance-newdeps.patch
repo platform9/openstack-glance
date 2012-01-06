@@ -2,12 +2,13 @@ Delve into pkg_resources a little to get it to modify sys.path,
 so that our parallel installed egg takes precedence over the
 system default module versions.
 
---- glance-2011.3.orig/glance/__init__.py	2011-09-21 21:46:35.000000000 +0100
-+++ glance-2011.3/glance/__init__.py	2011-11-22 14:49:33.454505203 +0000
-@@ -14,3 +14,25 @@
- #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- #    License for the specific language governing permissions and limitations
- #    under the License.
+diff -up glance-2011.3/glance/__init__.py.newdeps glance-2011.3/glance/__init__.py
+--- glance-2011.3/glance/__init__.py.newdeps	2012-01-06 17:22:36.000000000 +0000
++++ glance-2011.3/glance/__init__.py	2012-01-06 17:25:01.019063547 +0000
+@@ -18,3 +18,25 @@
+ import gettext
+ 
+ gettext.install('glance', unicode=1)
 +
 +import sys
 +import pkg_resources
