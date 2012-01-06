@@ -1,7 +1,7 @@
 
 Name:             openstack-glance
 Version:          2011.3
-Release:          5%{?dist}
+Release:          6%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -45,7 +45,7 @@ Patch20:          0020-Always-reference-the-glance-module-from-the-package-.patc
 Patch21:          0021-Don-t-access-the-net-while-building-docs.patch
 
 # EPEL specific
-#Patch100:           openstack-glance-newdeps.patch
+Patch100:         openstack-glance-newdeps.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -147,7 +147,7 @@ This package contains documentation files for glance.
 %patch20 -p1
 %patch21 -p1
 
-#%patch100 -p1 -b .newdeps
+%patch100 -p1 -b .newdeps
 
 sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
 
@@ -248,6 +248,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Fri Jan  6 2012 Pádraig Brady <P@draigBrady.com> - 2011.3-6
+- Reapply patch to use parallel install versions of epel packages
+
 * Fri Jan  6 2012 Mark McLoughlin <markmc@redhat.com> - 2011.3-5
 - Rebase to latest upstream stable/diablo branch adding ~20 patches
 
