@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2011.3.1
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -65,6 +65,7 @@ Requires:         python-webob1.0
 Requires:         python-setuptools
 Requires:         python-httplib2
 Requires:         python-migrate
+Requires:         python-crypto
 
 #
 # The image cache requires this http://pypi.python.org/pypi/xattr
@@ -212,6 +213,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Feb 13 2012 Russell Bryant <rbryant@redhat.com> - 2011.3.1-3
+- Add dependency on python-crypto. (rhbz#789943)
+
 * Thu Jan 26 2012 Russell Bryant <rbryant@redhat.com> - 2011.3.1-2
 - Add python-migrate dependency to python-glance (rhbz#784891)
 
