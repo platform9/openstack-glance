@@ -126,7 +126,7 @@ rm -f %{buildroot}%{_sysconfdir}/glance*.conf
 rm -f %{buildroot}%{_sysconfdir}/glance*.ini
 rm -f %{buildroot}%{_sysconfdir}/logging.cnf.sample
 rm -f %{buildroot}%{_sysconfdir}/policy.json
-rm -f %{buildroot}/usr/share/doc/glance/README
+rm -f %{buildroot}/usr/share/doc/glance/README.rst
 
 # Setup directories
 install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
@@ -183,7 +183,7 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %files
-%doc README
+%doc README.rst
 %{_bindir}/glance
 %{_bindir}/glance-api
 %{_bindir}/glance-control
@@ -210,7 +210,7 @@ fi
 %dir %attr(0755, glance, nobody) %{_localstatedir}/run/glance
 
 %files -n python-glance
-%doc README
+%doc README.rst
 %{python_sitelib}/glance
 %{python_sitelib}/glance-%{version}-*.egg-info
 
@@ -218,6 +218,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Feb 17 2012 Derek Higgins <derekh@redhat.com> 
+- README has been renamed to README.rst
+
 * Mon Feb 13 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.3.e3
 - Set PrivateTmp=true in glance systemd unit files. (rhbz#782505)
 - Add dependency on python-crypto. (rhbz#789943)
