@@ -52,6 +52,7 @@ Requires:         python-webob
 Requires:         python-httplib2
 Requires:         python-migrate
 Requires:         python-crypto
+Requires:         python-iso8601
 
 #
 # The image cache requires this http://pypi.python.org/pypi/xattr
@@ -218,7 +219,10 @@ fi
 %doc doc/build/html
 
 %changelog
-* Mon Feb 17 2012 Derek Higgins <derekh@redhat.com> 
+* Mon Feb 20 2012 Derek Higgins <derekh@redhat.com> 
+- Adding python-iso8601 as a dependency
+
+* Fri Feb 17 2012 Derek Higgins <derekh@redhat.com> 
 - README has been renamed to README.rst
 
 * Mon Feb 13 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.3.e3
