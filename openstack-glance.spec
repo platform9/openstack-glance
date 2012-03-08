@@ -1,18 +1,18 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          0.3.e3%{?dist}
+Release:          0.5.e4%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          http://launchpad.net/glance/essex/essex-3/+download/glance-2012.1~e3.tar.gz
+Source0:          http://launchpad.net/glance/essex/essex-4/+download/glance-2012.1~e4.tar.gz
 Source1:          openstack-glance-api.service
 Source2:          openstack-glance-registry.service
 Source3:          openstack-glance.logrotate
 
 #
-# patches_base=essex-3
+# patches_base=essex-4
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
@@ -43,25 +43,18 @@ This package contains the API and registry servers.
 Summary:          Glance Python libraries
 Group:            Applications/System
 
+Requires:         pysendfile
 Requires:         python-eventlet
+Requires:         python-httplib2
+Requires:         python-iso8601
 Requires:         python-kombu
+Requires:         python-migrate
 Requires:         python-paste-deploy
 Requires:         python-routes
 Requires:         python-sqlalchemy
 Requires:         python-webob
-Requires:         python-httplib2
-Requires:         python-migrate
 Requires:         python-crypto
-Requires:         python-iso8601
-
-#
-# The image cache requires this http://pypi.python.org/pypi/xattr
-# but Fedora's python-xattr is http://pyxattr.sourceforge.net/
-#
-# The cache is disabled by default, so it's only an issue if you
-# enabled it
-#
-Requires:         python-xattr
+Requires:         pyxattr
 
 %description -n   python-glance
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -219,11 +212,13 @@ fi
 %doc doc/build/html
 
 %changelog
-* Mon Feb 20 2012 Derek Higgins <derekh@redhat.com> 
-- Adding python-iso8601 as a dependency
+* Fri Mar 2 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.5.e4
+- Add python-iso8601 dependency.
 
-* Fri Feb 17 2012 Derek Higgins <derekh@redhat.com> 
-- README has been renamed to README.rst
+* Fri Mar 2 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.4.e4
+- Update to essex-4 milestone.
+- Change python-xattr depdendency to pyxattr.
+- Add pysendfile dependency.
 
 * Mon Feb 13 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.3.e3
 - Set PrivateTmp=true in glance systemd unit files. (rhbz#782505)
