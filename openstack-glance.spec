@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          0.5.e4%{?dist}
+Release:          0.6.e4%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -220,6 +220,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Thu Mar 15 2012 Derek Higgins <derekh@redhat.com> - 2012.1-0.6.e4
+- Minor change to 0001-Don-t-access-the-net-while-building-docs.patch
+
 * Thu Mar 8 2012 Dan Prince <dprince@redhat.com> - 2012.1-0.5.e4
 - Include config files for cache and scrubber.
 

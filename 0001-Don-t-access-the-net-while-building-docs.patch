@@ -21,5 +21,4 @@ index 5b02862..34816e5 100644
                'sphinx.ext.ifconfig',
 -              'sphinx.ext.intersphinx',
                'sphinx.ext.pngmath',
-               'sphinx.ext.graphviz',
-               'sphinx.ext.todo']
+               'sphinx.ext.graphviz']
