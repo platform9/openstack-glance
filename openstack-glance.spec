@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          0.6.e4%{?dist}
+Release:          0.7.e4%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -191,7 +191,6 @@ fi
 %{_bindir}/glance-cache-manage
 %{_bindir}/glance-cache-prefetcher
 %{_bindir}/glance-cache-pruner
-%{_bindir}/glance-cache-queue-image
 %{_bindir}/glance-scrubber
 %{_unitdir}/openstack-glance-api.service
 %{_unitdir}/openstack-glance-registry.service
@@ -220,6 +219,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Fri Mar 16 2012 Derek Higgins <derekh@redhat.com> - 2012.1-0.7.e4
+- Remove glance-cache-queue-image
+
 * Thu Mar 15 2012 Derek Higgins <derekh@redhat.com> - 2012.1-0.6.e4
 - Minor change to 0001-Don-t-access-the-net-while-building-docs.patch
 
