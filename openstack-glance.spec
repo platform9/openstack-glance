@@ -1,5 +1,5 @@
 Name:             openstack-glance
-Version:          2012.1
+Version:          2012.2
 Release:          0.7.e4%{?dist}
 Summary:          OpenStack Image Service
 
