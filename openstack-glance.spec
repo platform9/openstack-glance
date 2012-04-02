@@ -1,33 +1,25 @@
 Name:             openstack-glance
-Version:          2011.3.1
-Release:          3%{?dist}
+Version:          2012.1
+Release:          1%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          http://launchpad.net/glance/diablo/%{version}/+download/glance-%{version}.tar.gz
+Source0:          http://launchpad.net/glance/essex/2012.1/+download/glance-%{version}.tar.gz
 Source1:          openstack-glance-api.init
 Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
+Source4:          openstack-glance-db-setup
 
 #
-# Patches managed here: https://github.com/markmc/glance/tree/fedora-patches
+# patches_base=2012.1
 #
-#   $> git format-patch -N 2011.3.1
-#   $> for p in 00*.patch; do filterdiff -x '*/.gitignore' -x '*/.mailmap' -x '*/Authors' -x '*/.bzrignore' $p | sponge $p; done
-#   $> for p in 00*.patch; do echo "Patch${p:2:2}:          $p"; done
-#   $> for p in 00*.patch; do echo "%patch${p:2:2} -p1"; done
-#
-
-# These are from stable/diablo
-
-# These are fedora specific
-Patch01:          0001-Always-reference-the-glance-module-from-the-package-.patch
-Patch02:          0002-Don-t-access-the-net-while-building-docs.patch
+Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
 # EPEL specific
 Patch100:         openstack-glance-newdeps.patch
+Patch101:         crypto.random.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -56,25 +48,20 @@ This package contains the API and registry servers.
 Summary:          Glance Python libraries
 Group:            Applications/System
 
+Requires:         MySQL-python
+Requires:         pysendfile
 Requires:         python-eventlet
+Requires:         python-httplib2
+Requires:         python-iso8601
 Requires:         python-kombu
+Requires:         python-migrate
 Requires:         python-paste-deploy
 Requires:         python-routes
 Requires:         python-sqlalchemy0.7
 Requires:         python-webob1.0
 Requires:         python-setuptools
-Requires:         python-httplib2
-Requires:         python-migrate
 Requires:         python-crypto
-
-#
-# The image cache requires this http://pypi.python.org/pypi/xattr
-# but Fedora's python-xattr is http://pyxattr.sourceforge.net/
-#
-# The cache is disabled by default, so it's only an issue if you
-# enabled it
-#
-Requires:         python-xattr
+Requires:         pyxattr
 
 %description -n   python-glance
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -109,12 +96,12 @@ This package contains documentation files for glance.
 %prep
 %setup -q -n glance-%{version}
 
-%patch01 -p1
-%patch02 -p1
+%patch0001 -p1
 
-%patch100 -p1 -b .newdeps
+%patch100 -p1
+%patch101 -p1
 
-sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
+sed -i 's|\(sql_connection = \)sqlite:///glance.sqlite|\1mysql://glance:glance@localhost/glance|' etc/glance-registry.conf
 
 sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/registry/db/migrate_repo/manage.py
 
@@ -139,15 +126,25 @@ popd
 # Fix hidden-file-or-dir warnings
 rm -fr doc/build/html/.doctrees doc/build/html/.buildinfo
 rm -f %{buildroot}%{_sysconfdir}/glance*.conf
+rm -f %{buildroot}%{_sysconfdir}/glance*.ini
 rm -f %{buildroot}%{_sysconfdir}/logging.cnf.sample
-rm -f %{buildroot}/usr/share/doc/glance/README
+rm -f %{buildroot}%{_sysconfdir}/policy.json
+rm -f %{buildroot}/usr/share/doc/glance/README.rst
 
 # Setup directories
 install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
 
 # Config file
 install -p -D -m 644 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glance-api.conf
-install -p -D -m 644 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
+install -p -D -m 644 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-api-paste.ini
+# glance-registry.conf contains a db password
+install -p -D -m 640 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
+install -p -D -m 644 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
+install -p -D -m 644 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
+install -p -D -m 644 etc/glance-cache-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-cache-paste.ini
+install -p -D -m 644 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
+install -p -D -m 644 etc/glance-scrubber-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-scrubber-paste.ini
+install -p -D -m 644 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
 
 # Initscripts
 install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/openstack-glance-api
@@ -161,6 +158,9 @@ install -d -m 755 %{buildroot}%{_localstatedir}/run/glance
 
 # Install log directory
 install -d -m 755 %{buildroot}%{_localstatedir}/log/glance
+
+# Install database setup helper script.
+install -p -D -m 755 %{SOURCE4} %{buildroot}%{_bindir}/openstack-glance-db-setup
 
 %pre
 getent group glance >/dev/null || groupadd -r glance -g 161
@@ -182,30 +182,38 @@ if [ $1 = 0 ] ; then
 fi
 
 %files
-%doc README
+%doc README.rst
 %{_bindir}/glance
 %{_bindir}/glance-api
 %{_bindir}/glance-control
 %{_bindir}/glance-manage
 %{_bindir}/glance-registry
-%{_bindir}/glance-upload
+%{_bindir}/glance-cache-cleaner
+%{_bindir}/glance-cache-manage
 %{_bindir}/glance-cache-prefetcher
 %{_bindir}/glance-cache-pruner
-%{_bindir}/glance-cache-reaper
 %{_bindir}/glance-scrubber
+%{_bindir}/openstack-glance-db-setup
 %{_initrddir}/openstack-glance-api
 %{_initrddir}/openstack-glance-registry
-%{_mandir}/man1/glance-*.1.gz
+%{_mandir}/man1/glance*.1.gz
 %dir %{_sysconfdir}/glance
-%config(noreplace) %{_sysconfdir}/glance/glance-api.conf
-%config(noreplace) %{_sysconfdir}/glance/glance-registry.conf
-%config(noreplace) %{_sysconfdir}/logrotate.d/openstack-glance
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api-paste.ini
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-registry.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-registry-paste.ini
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-cache.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-cache-paste.ini
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-scrubber.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-scrubber-paste.ini
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/policy.json
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/logrotate.d/openstack-glance
 %dir %attr(0755, glance, nobody) %{_sharedstatedir}/glance
 %dir %attr(0755, glance, nobody) %{_localstatedir}/log/glance
 %dir %attr(0755, glance, nobody) %{_localstatedir}/run/glance
 
 %files -n python-glance
-%doc README
+%doc README.rst
 %{python_sitelib}/glance
 %{python_sitelib}/glance-%{version}-*.egg-info
 
@@ -213,6 +221,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Apr  9 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-1
+- Update to Essex final
+
 * Mon Feb 13 2012 Russell Bryant <rbryant@redhat.com> - 2011.3.1-3
 - Add dependency on python-crypto. (rhbz#789943)
 
