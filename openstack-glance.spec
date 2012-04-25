@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          3%{?dist}
+Release:          4%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -15,7 +15,9 @@ Source4:          openstack-glance-db-setup
 #
 # patches_base=2012.1
 #
-Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
+Patch0001: 0001-Ensure-swift-auth-URL-includes-trailing-slash.patch
+Patch0002: 0002-search-for-logger-in-PATH.patch
+Patch0003: 0003-Don-t-access-the-net-while-building-docs.patch
 
 # EPEL specific
 Patch100:         openstack-glance-newdeps.patch
@@ -97,6 +99,8 @@ This package contains documentation files for glance.
 %setup -q -n glance-%{version}
 
 %patch0001 -p1
+%patch0002 -p1
+%patch0003 -p1
 
 %patch100 -p1
 %patch101 -p1
@@ -221,6 +225,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Wed Apr 25 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-4
+- Fix leak of swift objects on deletion
+
 * Tue Apr 10 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-3
 - Fix db setup script to correctly start mysqld
 
