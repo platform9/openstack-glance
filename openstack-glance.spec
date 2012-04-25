@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -57,8 +57,8 @@ Requires:         python-httplib2
 Requires:         python-iso8601
 Requires:         python-kombu
 Requires:         python-migrate
-Requires:         python-paste-deploy
-Requires:         python-routes
+Requires:         python-paste-deploy1.5
+Requires:         python-routes1.12
 Requires:         python-sqlalchemy0.7
 Requires:         python-webob1.0
 Requires:         python-setuptools
@@ -85,7 +85,7 @@ BuildRequires:    python-boto
 BuildRequires:    python-daemon
 BuildRequires:    python-eventlet
 BuildRequires:    python-gflags
-BuildRequires:    python-routes
+BuildRequires:    python-routes1.12
 BuildRequires:    python-sqlalchemy0.7
 BuildRequires:    python-webob1.0
 
@@ -225,6 +225,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Wed Apr 25 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-5
+- Use parallel installed versions of python-routes and python-paste-deploy
+
 * Wed Apr 25 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-4
 - Fix leak of swift objects on deletion
 

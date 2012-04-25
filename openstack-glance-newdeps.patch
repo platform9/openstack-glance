@@ -5,7 +5,7 @@ system default module versions.
 diff -up glance-2011.3/glance/__init__.py.newdeps glance-2011.3/glance/__init__.py
 --- glance-2011.3/glance/__init__.py.newdeps	2012-01-06 17:22:36.000000000 +0000
 +++ glance-2011.3/glance/__init__.py	2012-01-06 17:25:01.019063547 +0000
-@@ -18,3 +18,25 @@
+@@ -18,3 +18,31 @@
  import gettext
  
  gettext.install('glance', unicode=1)
@@ -31,3 +31,11 @@ diff -up glance-2011.3/glance/__init__.py.newdeps glance-2011.3/glance/__init__.
 +
 +replace_dist("SQLALchemy >= 0.6.3")
 +replace_dist("WebOb >= 1.0")
++replace_dist("Routes >= 1.12.3")
++
++replace_dist("PasteDeploy >= 1.5.0")
++# This hack is needed because replace_dist() results in
++# the standard paste module path being at the start of __path__.
++# TODO: See can we get pkg_resources to do the right thing directly
++import paste
++paste.__path__.insert(0, paste.__path__.pop(-1))
