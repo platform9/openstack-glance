@@ -28,6 +28,11 @@ BuildRequires:    python2-devel
 BuildRequires:    python-setuptools
 BuildRequires:    python-distutils-extra
 BuildRequires:    intltool
+# These are required to build due to the requirements check added
+BuildRequires:    python-paste-deploy1.5
+BuildRequires:    python-routes1.12
+BuildRequires:    python-sqlalchemy0.7
+BuildRequires:    python-webob1.0
 
 Requires(post):   chkconfig
 Requires(preun):  initscripts
