@@ -90,9 +90,6 @@ BuildRequires:    python-boto
 BuildRequires:    python-daemon
 BuildRequires:    python-eventlet
 BuildRequires:    python-gflags
-BuildRequires:    python-routes1.12
-BuildRequires:    python-sqlalchemy0.7
-BuildRequires:    python-webob1.0
 
 %description      doc
 OpenStack Image Service (code-named Glance) provides discovery, registration,
