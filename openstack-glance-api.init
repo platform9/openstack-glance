@@ -2,7 +2,7 @@
 #
 # openstack-glance-api OpenStack Image Service API server
 #
-# chkconfig:   - 20 80
+# chkconfig:   - 98 02
 # description: OpenStack Image Service (code-named Glance) API server
 
 ### BEGIN INIT INFO

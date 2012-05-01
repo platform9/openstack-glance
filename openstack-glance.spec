@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          5%{?dist}
+Release:          6%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -227,6 +227,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue May 01 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-6
+- Start the services later in the boot sequence
+
 * Wed Apr 25 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-5
 - Use parallel installed versions of python-routes and python-paste-deploy
 
