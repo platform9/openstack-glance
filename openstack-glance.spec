@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          6%{?dist}
+Release:          7%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -26,7 +26,6 @@ Patch101:         crypto.random.patch
 BuildArch:        noarch
 BuildRequires:    python2-devel
 BuildRequires:    python-setuptools
-BuildRequires:    python-distutils-extra
 BuildRequires:    intltool
 # These are required to build due to the requirements check added
 BuildRequires:    python-paste-deploy1.5
@@ -60,7 +59,6 @@ Requires:         pysendfile
 Requires:         python-eventlet
 Requires:         python-httplib2
 Requires:         python-iso8601
-Requires:         python-kombu
 Requires:         python-migrate
 Requires:         python-paste-deploy1.5
 Requires:         python-routes1.12
@@ -227,6 +225,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Fri May 18 2012 Alan Pevec <apevec@redhat.com> - 2012.1-7
+- Drop hard dep on python-kombu, notifications are configurable
+
 * Tue May 01 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-6
 - Start the services later in the boot sequence
 
