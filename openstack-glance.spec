@@ -203,7 +203,6 @@ fi
 %{_bindir}/glance-cache-prefetcher
 %{_bindir}/glance-cache-pruner
 %{_bindir}/glance-scrubber
-%{_bindir}/openstack-glance-db-setup
 %{_initrddir}/openstack-glance-api
 %{_initrddir}/openstack-glance-registry
 %{_mandir}/man1/glance*.1.gz
