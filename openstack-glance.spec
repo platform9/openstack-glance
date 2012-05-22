@@ -10,7 +10,6 @@ Source0:          http://launchpad.net/glance/essex/2012.1/+download/glance-%{ve
 Source1:          openstack-glance-api.init
 Source2:          openstack-glance-registry.init
 Source3:          openstack-glance.logrotate
-Source5:          glance-registry.conf
 
 #
 # patches_base=2012.1
@@ -43,6 +42,7 @@ Requires(preun):  chkconfig
 Requires(pre):    shadow-utils
 Requires:         python-glance = %{version}-%{release}
 Requires:         openstack-utils
+BuildRequires:    openstack-utils
 
 %description
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -114,11 +114,14 @@ This package contains documentation files for glance.
 %patch100 -p1
 %patch101 -p1
 
-sed -i 's|\(sql_connection = \)sqlite:///glance.sqlite|\1mysql://glance:glance@localhost/glance|' etc/glance-registry.conf
-
 sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/registry/db/migrate_repo/manage.py
 
 %build
+
+# Change the default config
+openstack-config --set etc/glance-registry.conf DEFAULT sql_connection mysql://glance:glance@localhost/glance
+openstack-config --set etc/glance-registry.conf DEFAULT db_auto_create False
+
 %{__python} setup.py build
 
 %install
@@ -151,7 +154,7 @@ install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
 install -p -D -m 644 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glance-api.conf
 install -p -D -m 644 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-api-paste.ini
 # glance-registry.conf contains a db password
-install -p -D -m 640 %{SOURCE5} %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
+install -p -D -m 640 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
 install -p -D -m 644 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
 install -p -D -m 644 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
 install -p -D -m 644 etc/glance-cache-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-cache-paste.ini
