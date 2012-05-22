@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2012.1
-Release:          8%{?dist}
+Release:          9%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -230,6 +230,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue May 22 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-9
+- Fix an issue with glance-manage db_sync (#823702)
+
 * Mon May 21 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-8
 - Sync with essex stable
 - Don't auto create database on service start
