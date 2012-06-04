@@ -94,7 +94,7 @@ This package contains documentation files for glance.
 
 sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
 
-sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/registry/db/migrate_repo/manage.py
+sed -i '/\/usr\/bin\/env python/d' glance/common/config.py db/migrate_repo/manage.py
 
 %build
 %{__python} setup.py build
@@ -219,6 +219,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Jun 8 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
+- Update location of manage.py.
+
 * Fri Mar 16 2012 Derek Higgins <derekh@redhat.com> - 2012.1-0.7.e4
 - Remove glance-cache-queue-image
 
