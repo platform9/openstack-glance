@@ -94,7 +94,7 @@ This package contains documentation files for glance.
 
 sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
 
-sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/db/migrate_repo/manage.py
+sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/db/sqlalchemy/migrate_repo/manage.py
 
 %build
 %{__python} setup.py build
