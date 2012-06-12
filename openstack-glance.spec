@@ -54,6 +54,7 @@ Requires:         python-routes
 Requires:         python-sqlalchemy
 Requires:         python-webob
 Requires:         python-crypto
+Requires:         python-jsonschema
 Requires:         pyxattr
 
 %description -n   python-glance
@@ -219,6 +220,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Jun 12 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
+- Add Requires for python-jsonschema.
+
 * Mon Jun 8 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
 - Update location of manage.py.
 
