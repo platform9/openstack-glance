@@ -134,9 +134,7 @@ install -p -D -m 644 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/
 install -p -D -m 644 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
 install -p -D -m 644 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
 install -p -D -m 644 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
-install -p -D -m 644 etc/glance-cache-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-cache-paste.ini
 install -p -D -m 644 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
-install -p -D -m 644 etc/glance-scrubber-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-scrubber-paste.ini
 install -p -D -m 644 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
 install -p -D -m 644 etc/schema-access.json %{buildroot}%{_sysconfdir}/glance/schema-access.json
 install -p -D -m 644 etc/schema-image.json %{buildroot}%{_sysconfdir}/glance/schema-image.json
@@ -206,9 +204,7 @@ fi
 %config(noreplace) %{_sysconfdir}/glance/glance-registry.conf
 %config(noreplace) %{_sysconfdir}/glance/glance-registry-paste.ini
 %config(noreplace) %{_sysconfdir}/glance/glance-cache.conf
-%config(noreplace) %{_sysconfdir}/glance/glance-cache-paste.ini
 %config(noreplace) %{_sysconfdir}/glance/glance-scrubber.conf
-%config(noreplace) %{_sysconfdir}/glance/glance-scrubber-paste.ini
 %config(noreplace) %{_sysconfdir}/glance/policy.json
 %config(noreplace) %{_sysconfdir}/glance/schema-access.json
 %config(noreplace) %{_sysconfdir}/glance/schema-image.json
@@ -226,6 +222,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Jun 20 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
+- Remove paste ini files for glance cache and scrubber.
+
 * Mon Jun 12 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
 - Add Requires for python-jsonschema.
 - Add schema-access.json and schema-image.json config files.
