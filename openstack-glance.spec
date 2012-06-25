@@ -8,7 +8,9 @@ License:          ASL 2.0
 URL:              http://glance.openstack.org
 Source0:          http://launchpad.net/glance/essex/2012.1/+download/glance-%{version}.tar.gz
 Source1:          openstack-glance-api.init
+Source100:        openstack-glance-api.upstart
 Source2:          openstack-glance-registry.init
+Source200:        openstack-glance-registry.upstart
 Source3:          openstack-glance.logrotate
 
 #
@@ -148,6 +150,7 @@ rm -f %{buildroot}%{_sysconfdir}/policy.json
 rm -f %{buildroot}/usr/share/doc/glance/README.rst
 
 # Setup directories
+install -d -m 755 %{buildroot}%{_datadir}/glance
 install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
 
 # Config file
@@ -165,6 +168,10 @@ install -p -D -m 644 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.js
 # Initscripts
 install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/openstack-glance-api
 install -p -D -m 755 %{SOURCE2} %{buildroot}%{_initrddir}/openstack-glance-registry
+
+# Install upstart jobs examples
+install -p -m 644 %{SOURCE100} %{buildroot}%{_datadir}/glance/
+install -p -m 644 %{SOURCE200} %{buildroot}%{_datadir}/glance/
 
 # Logrotate config
 install -p -D -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/openstack-glance
@@ -208,6 +215,9 @@ fi
 %{_bindir}/glance-scrubber
 %{_initrddir}/openstack-glance-api
 %{_initrddir}/openstack-glance-registry
+%dir %{_datadir}/glance
+%{_datadir}/glance/openstack-glance-api.upstart
+%{_datadir}/glance/openstack-glance-registry.upstart
 %{_mandir}/man1/glance*.1.gz
 %dir %{_sysconfdir}/glance
 %config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api.conf
