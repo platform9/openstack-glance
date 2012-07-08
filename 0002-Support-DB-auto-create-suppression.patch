@@ -1,4 +1,4 @@
-From d44afa05c270335d6c9812913f35d75669f0886a Mon Sep 17 00:00:00 2001
+From 48ae8ec33128cec1a2d4a33f4f5ced6df2d2f6cb Mon Sep 17 00:00:00 2001
 From: Eoghan Glynn <eglynn@redhat.com>
 Date: Fri, 18 May 2012 14:23:41 +0100
 Subject: [PATCH] Support DB auto-create suppression.
@@ -261,10 +261,10 @@ index 5260a89..da0c944 100644
  
      def run_sql_cmd(self, sql):
 diff --git a/glance/tests/functional/test_bin_glance.py b/glance/tests/functional/test_bin_glance.py
-index a989b58..5393872 100644
+index b8628e4..5c9d2ef 100644
 --- a/glance/tests/functional/test_bin_glance.py
 +++ b/glance/tests/functional/test_bin_glance.py
-@@ -643,7 +643,6 @@ class TestBinGlance(functional.FunctionalTest):
+@@ -647,7 +647,6 @@ class TestBinGlance(functional.FunctionalTest):
  
          self.stop_servers()
  
@@ -272,7 +272,7 @@ index a989b58..5393872 100644
      def test_add_location_with_checksum(self):
          """
          We test the following:
-@@ -675,7 +674,6 @@ class TestBinGlance(functional.FunctionalTest):
+@@ -679,7 +678,6 @@ class TestBinGlance(functional.FunctionalTest):
  
          self.stop_servers()
  
@@ -280,7 +280,7 @@ index a989b58..5393872 100644
      def test_add_location_without_checksum(self):
          """
          We test the following:
-@@ -707,7 +705,6 @@ class TestBinGlance(functional.FunctionalTest):
+@@ -711,7 +709,6 @@ class TestBinGlance(functional.FunctionalTest):
  
          self.stop_servers()
  

@@ -1,6 +1,6 @@
 Name:             openstack-glance
-Version:          2012.1
-Release:          10%{?dist}
+Version:          2012.1.1
+Release:          1%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -14,15 +14,10 @@ Source200:        openstack-glance-registry.upstart
 Source3:          openstack-glance.logrotate
 
 #
-# patches_base=2012.1
+# patches_base=2012.1.1
 #
-Patch0001: 0001-Ensure-swift-auth-URL-includes-trailing-slash.patch
-Patch0002: 0002-search-for-logger-in-PATH.patch
-Patch0003: 0003-Fix-content-type-for-qpid-notifier.patch
-Patch0004: 0004-Omit-Content-Length-on-chunked-transfer.patch
-Patch0005: 0005-Fix-i18n-in-glance.notifier.notify_kombu.patch
-Patch0006: 0006-Don-t-access-the-net-while-building-docs.patch
-Patch0007: 0007-Support-DB-auto-create-suppression.patch
+Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
+Patch0002: 0002-Support-DB-auto-create-suppression.patch
 
 # EPEL specific
 Patch100:         openstack-glance-newdeps.patch
@@ -107,11 +102,6 @@ This package contains documentation files for glance.
 
 %patch0001 -p1
 %patch0002 -p1
-%patch0003 -p1
-%patch0004 -p1
-%patch0005 -p1
-%patch0006 -p1
-%patch0007 -p1
 
 %patch100 -p1
 %patch101 -p1
@@ -243,6 +233,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Jul  9 2012 Pádraig Brady <P@draigBrady.com> - 2012.1.1-1
+- Update to stable/essex 2012.1.1
+
 * Tue May 22 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-10
 - Fix an issue with glance-manage db_sync (#823702)
 
