@@ -235,6 +235,7 @@ fi
 * Mon Jul  9 2012 Pádraig Brady <P@draigBrady.com> - 2012.1.1-1
 - Update to stable/essex 2012.1.1
 - Remove world readable bit on sensitive config files
+- Include optional upstart jobs
 
 * Tue May 22 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-10
 - Fix an issue with glance-manage db_sync (#823702)
