@@ -144,16 +144,15 @@ install -d -m 755 %{buildroot}%{_datadir}/glance
 install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
 
 # Config file
-install -p -D -m 644 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glance-api.conf
-install -p -D -m 644 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-api-paste.ini
-# glance-registry.conf contains a db password
+install -p -D -m 640 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glance-api.conf
+install -p -D -m 640 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-api-paste.ini
 install -p -D -m 640 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
-install -p -D -m 644 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
-install -p -D -m 644 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
-install -p -D -m 644 etc/glance-cache-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-cache-paste.ini
-install -p -D -m 644 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
-install -p -D -m 644 etc/glance-scrubber-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-scrubber-paste.ini
-install -p -D -m 644 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
+install -p -D -m 640 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
+install -p -D -m 640 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
+install -p -D -m 640 etc/glance-cache-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-cache-paste.ini
+install -p -D -m 640 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
+install -p -D -m 640 etc/glance-scrubber-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-scrubber-paste.ini
+install -p -D -m 640 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
 
 # Initscripts
 install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/openstack-glance-api
@@ -235,6 +234,7 @@ fi
 %changelog
 * Mon Jul  9 2012 Pádraig Brady <P@draigBrady.com> - 2012.1.1-1
 - Update to stable/essex 2012.1.1
+- Remove world readable bit on sensitive config files
 
 * Tue May 22 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-10
 - Fix an issue with glance-manage db_sync (#823702)
