@@ -190,6 +190,7 @@ fi
 %{_bindir}/glance-control
 %{_bindir}/glance-manage
 %{_bindir}/glance-registry
+%{_bindir}/glance-replicator
 %{_bindir}/glance-cache-cleaner
 %{_bindir}/glance-cache-manage
 %{_bindir}/glance-cache-prefetcher
@@ -222,6 +223,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Jul 10 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
+- Add bin/glance-replicator.
+
 * Mon Jun 20 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
 - Remove paste ini files for glance cache and scrubber.
 
