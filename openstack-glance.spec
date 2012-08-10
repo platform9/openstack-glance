@@ -121,7 +121,6 @@ rm -f %{buildroot}%{_sysconfdir}/glance*.conf
 rm -f %{buildroot}%{_sysconfdir}/glance*.ini
 rm -f %{buildroot}%{_sysconfdir}/logging.cnf.sample
 rm -f %{buildroot}%{_sysconfdir}/policy.json
-rm -f %{buildroot}%{_sysconfdir}/schema-access.json
 rm -f %{buildroot}%{_sysconfdir}/schema-image.json
 rm -f %{buildroot}/usr/share/doc/glance/README.rst
 
@@ -136,7 +135,6 @@ install -p -D -m 644 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/gl
 install -p -D -m 644 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
 install -p -D -m 644 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
 install -p -D -m 644 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
-install -p -D -m 644 etc/schema-access.json %{buildroot}%{_sysconfdir}/glance/schema-access.json
 install -p -D -m 644 etc/schema-image.json %{buildroot}%{_sysconfdir}/glance/schema-image.json
 
 # Initscripts
@@ -207,7 +205,6 @@ fi
 %config(noreplace) %{_sysconfdir}/glance/glance-cache.conf
 %config(noreplace) %{_sysconfdir}/glance/glance-scrubber.conf
 %config(noreplace) %{_sysconfdir}/glance/policy.json
-%config(noreplace) %{_sysconfdir}/glance/schema-access.json
 %config(noreplace) %{_sysconfdir}/glance/schema-image.json
 %config(noreplace) %{_sysconfdir}/logrotate.d/openstack-glance
 %dir %attr(0755, glance, nobody) %{_sharedstatedir}/glance
@@ -223,6 +220,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Aug 10 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
+- Remove schema-access.json.
+
 * Mon Jul 10 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
 - Add bin/glance-replicator.
 
