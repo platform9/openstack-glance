@@ -106,6 +106,9 @@ sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/db/sqlalchemy/
 # Delete tests
 rm -fr %{buildroot}%{python_sitelib}/tests
 
+# Remove bin/glance if it exists (deprecated)
+rm -f %{buildroot}%{_bindir}/glance
+
 export PYTHONPATH="$( pwd ):$PYTHONPATH"
 pushd doc
 sphinx-build -b html source build/html
@@ -183,7 +186,6 @@ fi
 
 %files
 %doc README.rst
-%{_bindir}/glance
 %{_bindir}/glance-api
 %{_bindir}/glance-control
 %{_bindir}/glance-manage
