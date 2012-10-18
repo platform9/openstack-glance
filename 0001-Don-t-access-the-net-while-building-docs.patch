@@ -1,4 +1,4 @@
-From bceb3da7bb472c2186929fe065770fd9812e3e87 Mon Sep 17 00:00:00 2001
+From 9bce91a06fcd87e33c64f46596e863f7078fdf56 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?P=C3=A1draig=20Brady?= <pbrady@redhat.com>
 Date: Fri, 6 Jan 2012 17:12:54 +0000
 Subject: [PATCH] Don't access the net while building docs
@@ -12,12 +12,12 @@ Change-Id: I42c6e3a5062db209a0abe00cebc04d383c79cbcb
  1 files changed, 0 insertions(+), 1 deletions(-)
 
 diff --git a/doc/source/conf.py b/doc/source/conf.py
-index a6a3c35..670e4f3 100644
+index 50cdba5..8117e0f 100644
 --- a/doc/source/conf.py
 +++ b/doc/source/conf.py
-@@ -45,7 +45,6 @@ sys.path = [os.path.abspath('../../glance'),
- extensions = ['sphinx.ext.autodoc',
-               'sphinx.ext.coverage',
+@@ -44,7 +44,6 @@ sys.path = [os.path.abspath('../../glance'),
+ # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+ extensions = ['sphinx.ext.coverage',
                'sphinx.ext.ifconfig',
 -              'sphinx.ext.intersphinx',
                'sphinx.ext.pngmath',
