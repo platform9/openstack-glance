@@ -1,25 +1,27 @@
+#
+# This is 2012.2 folsom release
+#
 Name:             openstack-glance
 Version:          2012.2
-Release:          0.7.e4%{?dist}
+Release:          2%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          http://launchpad.net/glance/essex/essex-4/+download/glance-2012.1~e4.tar.gz
+Source0:          https://launchpad.net/glance/folsom/%{version}/+download/glance-%{version}.tar.gz
 Source1:          openstack-glance-api.service
 Source2:          openstack-glance-registry.service
 Source3:          openstack-glance.logrotate
 
 #
-# patches_base=essex-4
+# patches_base=2012.2
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
 BuildRequires:    python-setuptools
-BuildRequires:    python-distutils-extra
 BuildRequires:    intltool
 
 Requires(post):   systemd-units
@@ -27,6 +29,9 @@ Requires(preun):  systemd-units
 Requires(postun): systemd-units
 Requires(pre):    shadow-utils
 Requires:         python-glance = %{version}-%{release}
+Requires:         python-glanceclient >= 1:0
+Requires:         openstack-utils
+BuildRequires:    openstack-utils
 
 %description
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -43,19 +48,25 @@ This package contains the API and registry servers.
 Summary:          Glance Python libraries
 Group:            Applications/System
 
+Requires:         MySQL-python
 Requires:         pysendfile
 Requires:         python-eventlet
 Requires:         python-httplib2
 Requires:         python-iso8601
-Requires:         python-kombu
+Requires:         python-jsonschema
 Requires:         python-migrate
 Requires:         python-paste-deploy
 Requires:         python-routes
 Requires:         python-sqlalchemy
 Requires:         python-webob
 Requires:         python-crypto
-Requires:         python-jsonschema
 Requires:         pyxattr
+Requires:         python-swiftclient
+
+#test deps: python-mox python-nose python-requests
+#test and optional store:
+#ceph - glance.store.rdb
+#python-boto - glance.store.s3
 
 %description -n   python-glance
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -75,9 +86,7 @@ BuildRequires:    graphviz
 
 # Required to build module documents
 BuildRequires:    python-boto
-BuildRequires:    python-daemon
 BuildRequires:    python-eventlet
-BuildRequires:    python-gflags
 BuildRequires:    python-routes
 BuildRequires:    python-sqlalchemy
 BuildRequires:    python-webob
@@ -93,11 +102,45 @@ This package contains documentation files for glance.
 
 %patch0001 -p1
 
-sed -i 's|\(sql_connection = sqlite:///\)\(glance.sqlite\)|\1%{_sharedstatedir}/glance/\2|' etc/glance-registry.conf
-
-sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/db/sqlalchemy/migrate_repo/manage.py
+# Remove bundled egg-info
+rm -rf glance.egg-info
+sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/common/crypt.py glance/db/sqlalchemy/migrate_repo/manage.py
+# versioninfo is missing in f3 tarball
+echo %{version} > glance/versioninfo
 
 %build
+
+# Change the default config
+openstack-config --set etc/glance-registry.conf DEFAULT sql_connection mysql://glance:glance@localhost/glance
+openstack-config --set etc/glance-api.conf DEFAULT sql_connection mysql://glance:glance@localhost/glance
+# Move authtoken configuration out of paste.ini
+openstack-config --del etc/glance-api-paste.ini filter:authtoken admin_tenant_name
+openstack-config --del etc/glance-api-paste.ini filter:authtoken admin_user
+openstack-config --del etc/glance-api-paste.ini filter:authtoken admin_password
+openstack-config --del etc/glance-api-paste.ini filter:authtoken auth_host
+openstack-config --del etc/glance-api-paste.ini filter:authtoken auth_port
+openstack-config --del etc/glance-api-paste.ini filter:authtoken auth_protocol
+#openstack-config --set etc/glance-api.conf paste_deploy flavor keystone
+openstack-config --set etc/glance-api.conf keystone_authtoken admin_tenant_name %%SERVICE_TENANT_NAME%%
+openstack-config --set etc/glance-api.conf keystone_authtoken admin_user %SERVICE_USER%
+openstack-config --set etc/glance-api.conf keystone_authtoken admin_password %SERVICE_PASSWORD%
+openstack-config --set etc/glance-api.conf keystone_authtoken auth_host 127.0.0.1
+openstack-config --set etc/glance-api.conf keystone_authtoken auth_port 35357
+openstack-config --set etc/glance-api.conf keystone_authtoken auth_protocol http
+openstack-config --del etc/glance-registry-paste.ini filter:authtoken admin_tenant_name
+openstack-config --del etc/glance-registry-paste.ini filter:authtoken admin_user
+openstack-config --del etc/glance-registry-paste.ini filter:authtoken admin_password
+openstack-config --del etc/glance-registry-paste.ini filter:authtoken auth_host
+openstack-config --del etc/glance-registry-paste.ini filter:authtoken auth_port
+openstack-config --del etc/glance-registry-paste.ini filter:authtoken auth_protocol
+#openstack-config --set etc/glance-registry.conf paste_deploy flavor keystone
+openstack-config --set etc/glance-registry.conf keystone_authtoken admin_tenant_name %%SERVICE_TENANT_NAME%%
+openstack-config --set etc/glance-registry.conf keystone_authtoken admin_user %SERVICE_USER%
+openstack-config --set etc/glance-registry.conf keystone_authtoken admin_password %SERVICE_PASSWORD%
+openstack-config --set etc/glance-registry.conf keystone_authtoken auth_host 127.0.0.1
+openstack-config --set etc/glance-registry.conf keystone_authtoken auth_port 35357
+openstack-config --set etc/glance-registry.conf keystone_authtoken auth_protocol http
+
 %{__python} setup.py build
 
 %install
@@ -106,7 +149,8 @@ sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/db/sqlalchemy/
 # Delete tests
 rm -fr %{buildroot}%{python_sitelib}/tests
 
-# Remove bin/glance if it exists (deprecated)
+# Drop old glance CLI it has been deprecated
+# and replaced glanceclient
 rm -f %{buildroot}%{_bindir}/glance
 
 export PYTHONPATH="$( pwd ):$PYTHONPATH"
@@ -131,14 +175,14 @@ rm -f %{buildroot}/usr/share/doc/glance/README.rst
 install -d -m 755 %{buildroot}%{_sharedstatedir}/glance/images
 
 # Config file
-install -p -D -m 644 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glance-api.conf
-install -p -D -m 644 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-api-paste.ini
-install -p -D -m 644 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
-install -p -D -m 644 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
-install -p -D -m 644 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
-install -p -D -m 644 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
-install -p -D -m 644 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
-install -p -D -m 644 etc/schema-image.json %{buildroot}%{_sysconfdir}/glance/schema-image.json
+install -p -D -m 640 etc/glance-api.conf %{buildroot}%{_sysconfdir}/glance/glance-api.conf
+install -p -D -m 640 etc/glance-api-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-api-paste.ini
+install -p -D -m 640 etc/glance-registry.conf %{buildroot}%{_sysconfdir}/glance/glance-registry.conf
+install -p -D -m 640 etc/glance-registry-paste.ini %{buildroot}%{_sysconfdir}/glance/glance-registry-paste.ini
+install -p -D -m 640 etc/glance-cache.conf %{buildroot}%{_sysconfdir}/glance/glance-cache.conf
+install -p -D -m 640 etc/glance-scrubber.conf %{buildroot}%{_sysconfdir}/glance/glance-scrubber.conf
+install -p -D -m 640 etc/policy.json %{buildroot}%{_sysconfdir}/glance/policy.json
+install -p -D -m 640 etc/schema-image.json %{buildroot}%{_sysconfdir}/glance/schema-image.json
 
 # Initscripts
 install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/openstack-glance-api.service
@@ -190,25 +234,26 @@ fi
 %{_bindir}/glance-control
 %{_bindir}/glance-manage
 %{_bindir}/glance-registry
-%{_bindir}/glance-replicator
 %{_bindir}/glance-cache-cleaner
 %{_bindir}/glance-cache-manage
 %{_bindir}/glance-cache-prefetcher
 %{_bindir}/glance-cache-pruner
 %{_bindir}/glance-scrubber
+%{_bindir}/glance-replicator
+
 %{_unitdir}/openstack-glance-api.service
 %{_unitdir}/openstack-glance-registry.service
 %{_mandir}/man1/glance*.1.gz
 %dir %{_sysconfdir}/glance
-%config(noreplace) %{_sysconfdir}/glance/glance-api.conf
-%config(noreplace) %{_sysconfdir}/glance/glance-api-paste.ini
-%config(noreplace) %{_sysconfdir}/glance/glance-registry.conf
-%config(noreplace) %{_sysconfdir}/glance/glance-registry-paste.ini
-%config(noreplace) %{_sysconfdir}/glance/glance-cache.conf
-%config(noreplace) %{_sysconfdir}/glance/glance-scrubber.conf
-%config(noreplace) %{_sysconfdir}/glance/policy.json
-%config(noreplace) %{_sysconfdir}/glance/schema-image.json
-%config(noreplace) %{_sysconfdir}/logrotate.d/openstack-glance
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api-paste.ini
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-registry.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-registry-paste.ini
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-cache.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-scrubber.conf
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/policy.json
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/schema-image.json
+%config(noreplace) %attr(-, root, glance) %{_sysconfdir}/logrotate.d/openstack-glance
 %dir %attr(0755, glance, nobody) %{_sharedstatedir}/glance
 %dir %attr(0755, glance, nobody) %{_localstatedir}/log/glance
 %dir %attr(0755, glance, nobody) %{_localstatedir}/run/glance
@@ -218,33 +263,76 @@ fi
 %{python_sitelib}/glance
 %{python_sitelib}/glance-%{version}-*.egg-info
 
+
 %files doc
 %doc doc/build/html
 
 %changelog
-* Mon Aug 10 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
-- Remove schema-access.json.
+* Thu Sep 27 2012 Alan Pevec <apevec@redhat.com> 2012.2-2
+- Update to folsom final
 
-* Mon Jul 10 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
-- Add bin/glance-replicator.
+* Wed Sep 26 2012 Alan Pevec <apevec@redhat.com> 2012.2-0.7.rc3
+- Update to Folsom rc3
 
-* Mon Jun 20 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
-- Remove paste ini files for glance cache and scrubber.
+* Tue Sep 25 2012 Alan Pevec <apevec@redhat.com> 2012.2-0.6.rc2
+- Update to Folsom rc2
 
-* Mon Jun 12 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
-- Add Requires for python-jsonschema.
-- Add schema-access.json and schema-image.json config files.
+* Fri Sep 14 2012 Alan Pevec <apevec@redhat.com> 2012.2-0.5.rc1
+- Update to Folsom rc1
 
-* Mon Jun 8 2012 Dan Prince <dprince@redhat.com> - 2012.2-0.7.f2
-- Update location of manage.py.
+* Thu Aug 23 2012 Alan Pevec <apevec@redhat.com> 2012.2-0.4.f3
+- Update to folsom-3 milestone
+- Drop old glance CLI, deprecated by python-glanceclient
 
-* Fri Mar 16 2012 Derek Higgins <derekh@redhat.com> - 2012.1-0.7.e4
-- Remove glance-cache-queue-image
+* Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2012.2-0.2.f1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+- Remove world readable bit on sensitive config files
 
-* Thu Mar 15 2012 Derek Higgins <derekh@redhat.com> - 2012.1-0.6.e4
-- Minor change to 0001-Don-t-access-the-net-while-building-docs.patch
+* Tue May 28 2012 Pádraig Brady <P@draigBrady.com> - 2012.2-0.1.f1
+- Update to Folsom milestone 1
 
-* Thu Mar 8 2012 Dan Prince <dprince@redhat.com> - 2012.1-0.5.e4
+* Tue May 22 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-8
+- Fix an issue with glance-manage db_sync (#823702)
+
+* Mon May 21 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-6
+- Sync with essex stable
+- Don't auto create database on service start
+- Remove openstack-glance-db-setup. use openstack-db instead
+
+* Fri May 18 2012 Alan Pevec <apevec@redhat.com> - 2012.1-5
+- Drop hard dep on python-kombu, notifications are configurable
+
+* Wed Apr 25 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-4
+- Fix leak of swift objects on deletion
+
+* Tue Apr 10 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-3
+- Fix db setup script to correctly start mysqld
+
+* Tue Apr 10 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-2
+- Fix startup failure due to a file ownership issue (#811130)
+
+* Mon Apr  9 2012 Pádraig Brady <P@draigBrady.com> - 2012.1-1
+- Update to Essex final
+
+* Fri Mar 30 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.11.rc2
+- Update to Essex rc2
+
+* Wed Mar 28 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.10.rc1
+- Update openstack-glance-db-setup to common script from openstack-keystone package.
+- Change permissions of glance-registry.conf to 0640.
+- Set group on all config files to glance.
+
+* Tue Mar 27 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.9.rc1
+- Use MySQL by default.
+- Add openstack-glance-db-setup script.
+
+* Wed Mar 21 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.8.rc1
+- Fix source URL for essex rc1
+
+* Wed Mar 21 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.7.rc1
+- Update to essex rc1
+
+* Thu Mar 8 2012 Dan Prince <dprince@redhat.com> - 2012.1-0.6.e4
 - Include config files for cache and scrubber.
 
 * Fri Mar 2 2012 Russell Bryant <rbryant@redhat.com> - 2012.1-0.5.e4
