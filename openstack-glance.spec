@@ -61,7 +61,7 @@ Requires:         python-sqlalchemy
 Requires:         python-webob
 Requires:         python-crypto
 Requires:         pyxattr
-Requires:         python-swiftclient
+#Requires:         python-swiftclient
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
