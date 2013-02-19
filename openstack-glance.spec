@@ -59,6 +59,7 @@ Requires:         python-webob
 Requires:         python-crypto
 Requires:         pyxattr
 Requires:         python-swiftclient
+Requires:         python-oslo-config
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -265,6 +266,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Feb 19 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
+- Add dependency on python-oslo-config.
+
 * Fri Jan 11 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.2.g2
 - Update to Grizzlt milestone 2
 
