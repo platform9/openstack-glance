@@ -1,12 +1,12 @@
 Name:             openstack-glance
 Version:          2013.1
-Release:          0.2.g2%{?dist}
+Release:          0.3.g3%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          https://launchpad.net/glance/grizzly/grizzly-2/+download/glance-2013.1~g2.tar.gz
+Source0:          https://launchpad.net/glance/grizzly/grizzly-3/+download/glance-2013.1.g3.tar.gz
 Source1:          openstack-glance-api.init
 Source100:        openstack-glance-api.upstart
 Source2:          openstack-glance-registry.init
@@ -14,7 +14,7 @@ Source200:        openstack-glance-registry.upstart
 Source3:          openstack-glance.logrotate
 
 #
-# patches_base=grizzly-2
+# patches_base=2013.1.g3
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
@@ -70,6 +70,7 @@ Requires:         python-webob1.0
 Requires:         python-crypto
 Requires:         pyxattr
 Requires:         python-swiftclient
+Requires:         python-oslo-config
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -102,7 +103,7 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}
+%setup -q -n glance-%{version}.g3
 
 %patch0001 -p1
 
@@ -263,13 +264,16 @@ fi
 %files -n python-glance
 %doc README.rst
 %{python_sitelib}/glance
-%{python_sitelib}/glance-%{version}-*.egg-info
+%{python_sitelib}/glance-%{version}*.egg-info
 
 
 %files doc
 %doc doc/build/html
 
 %changelog
+* Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.5.g3
+- Update to Grizzlt milestone 3
+
 * Fri Jan 11 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.2.g2
 - Update to Grizzly milestone 2
 
