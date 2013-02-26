@@ -271,7 +271,7 @@ fi
 %doc doc/build/html
 
 %changelog
-* Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.5.g3
+* Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.3.g3
 - Update to Grizzlt milestone 3
 
 * Fri Jan 11 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.2.g2
