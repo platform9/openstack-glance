@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2013.1
-Release:          0.3.g3%{?dist}
+Release:          0.4.g3%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -229,6 +229,14 @@ if [ $1 = 0 ] ; then
     /sbin/chkconfig --del openstack-glance-registry
 fi
 
+%postun
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in api registry ; do
+        /sbin/service openstack-glance-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+
 %files
 %doc README.rst
 %{_bindir}/glance-api
@@ -271,6 +279,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.4.g3
+- Restart glance service after upgrade
+
 * Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.3.g3
 - Update to Grizzlt milestone 3
 
