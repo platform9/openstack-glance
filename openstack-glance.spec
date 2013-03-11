@@ -279,7 +279,7 @@ fi
 %doc doc/build/html
 
 %changelog
-* Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.4.g3
+* Mon Mar 11 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.4.g3
 - Restart glance service after upgrade
 
 * Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.3.g3
