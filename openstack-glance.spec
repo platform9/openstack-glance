@@ -1,12 +1,12 @@
 Name:             openstack-glance
 Version:          2013.1
-Release:          0.8.rc2%{?dist}
+Release:          1%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          https://launchpad.net/glance/grizzly/grizzly-rc2/+download/glance-2013.1.rc2.tar.gz
+Source0:          https://launchpad.net/glance/grizzly/2013.1/+download/glance-2013.1.tar.gz
 Source1:          openstack-glance-api.init
 Source100:        openstack-glance-api.upstart
 Source2:          openstack-glance-registry.init
@@ -14,7 +14,7 @@ Source200:        openstack-glance-registry.upstart
 Source3:          openstack-glance.logrotate
 
 #
-# patches_base=2013.1.rc2
+# patches_base=2013.1
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
@@ -103,7 +103,7 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}.rc2
+%setup -q -n glance-%{version}
 
 %patch0001 -p1
 
@@ -279,6 +279,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Apr 08 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-1
+- Update to Grizzly final
+
 * Tue Apr  2 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.8.rc2
 - Update to Grizzly RC2
 
