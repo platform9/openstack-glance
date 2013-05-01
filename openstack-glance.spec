@@ -15,6 +15,7 @@ Source3:          openstack-glance.logrotate
 # patches_base=grizzly-2
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
+Patch0002: 0002-remove-auto-deps.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -99,6 +100,7 @@ This package contains documentation files for glance.
 %setup -q -n glance-%{version}
 
 %patch0001 -p1
+%patch0002 -p1
 
 # Remove bundled egg-info
 rm -rf glance.egg-info
@@ -266,6 +268,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Wed May 1 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
+- Add patch to remove auto deps.
+
 * Tue Feb 19 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
 - Add dependency on python-oslo-config.
 
