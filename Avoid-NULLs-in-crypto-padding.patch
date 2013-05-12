@@ -1,0 +1,47 @@
+From 4458d6af24ba1e9dcb72b7b15b99cba9dce6b4ca Mon Sep 17 00:00:00 2001
+From: Eoghan Glynn <eglynn@redhat.com>
+Date: Wed, 30 Jan 2013 17:43:52 +0000
+Subject: [PATCH] Avoid NULLs in crypto padding.
+
+Also include missing import of the os module.
+
+The problem does not exist upstream, as the regression was
+introduced in a RHEL-specific patch:
+
+  efebcc2b36353becd1e570ce4b4be5a659fa78e3
+
+Fixes bug: 906051
+
+Change-Id: I70a9b3340ff454ae75c32ee75e121f0de4de938b
+Reviewed-on: https://code.engineering.redhat.com/gerrit/2809
+Reviewed-by: Nikola Dipanov <ndipanov@redhat.com>
+Tested-by: Nikola Dipanov <ndipanov@redhat.com>
+---
+ glance/common/crypt.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/glance/common/crypt.py b/glance/common/crypt.py
+index ef6496b..3874de7 100644
+--- a/glance/common/crypt.py
++++ b/glance/common/crypt.py
+@@ -21,6 +21,10 @@ Routines for URL-safe encrypting/decrypting
+ """
+ 
+ import base64
++import os
++import random
++import string
++
+ from Crypto.Cipher import AES
+ 
+ 
+@@ -38,7 +42,8 @@ def urlsafe_encrypt(key, plaintext, blocksize=16):
+         Pads text to be encrypted
+         """
+         pad_length = (blocksize - len(text) % blocksize)
+-        pad = os.urandom(pad_length - 1)
++        pad = "".join([random.choice([chr(i) for i in range(1,0xFF)])
++                      for j in xrange(pad_length - 1)])
+         # We use chr(0) as a delimiter between text and padding
+         return text + chr(0) + pad
+ 
