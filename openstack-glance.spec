@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2013.1
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -11,7 +11,9 @@ Source1:          openstack-glance-api.init
 Source100:        openstack-glance-api.upstart
 Source2:          openstack-glance-registry.init
 Source200:        openstack-glance-registry.upstart
-Source3:          openstack-glance.logrotate
+Source3:          openstack-glance-scrubber.init
+Source300:        openstack-glance-scrubber.upstart
+Source4:          openstack-glance.logrotate
 
 #
 # patches_base=2013.1
@@ -198,13 +200,15 @@ install -p -D -m 640 etc/schema-image.json %{buildroot}%{_sysconfdir}/glance/sch
 # Initscripts
 install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/openstack-glance-api
 install -p -D -m 755 %{SOURCE2} %{buildroot}%{_initrddir}/openstack-glance-registry
+install -p -D -m 755 %{SOURCE3} %{buildroot}%{_initrddir}/openstack-glance-scrubber
 
 # Install upstart jobs examples
 install -p -m 644 %{SOURCE100} %{buildroot}%{_datadir}/glance/
 install -p -m 644 %{SOURCE200} %{buildroot}%{_datadir}/glance/
+install -p -m 644 %{SOURCE300} %{buildroot}%{_datadir}/glance/
 
 # Logrotate config
-install -p -D -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/openstack-glance
+install -p -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/openstack-glance
 
 # Install pid directory
 install -d -m 755 %{buildroot}%{_localstatedir}/run/glance
@@ -222,6 +226,7 @@ exit 0
 %post
 /sbin/chkconfig --add openstack-glance-api
 /sbin/chkconfig --add openstack-glance-registry
+/sbin/chkconfig --add openstack-glance-scrubber
 
 %preun
 if [ $1 = 0 ] ; then
@@ -229,12 +234,14 @@ if [ $1 = 0 ] ; then
     /sbin/chkconfig --del openstack-glance-api
     /sbin/service openstack-glance-registry stop >/dev/null 2>&1
     /sbin/chkconfig --del openstack-glance-registry
+    /sbin/service openstack-glance-scrubber stop >/dev/null 2>&1
+    /sbin/chkconfig --del openstack-glance-scrubber
 fi
 
 %postun
 if [ $1 -ge 1 ] ; then
     # Package upgrade, not uninstall
-    for svc in api registry ; do
+    for svc in api registry scrubber; do
         /sbin/service openstack-glance-${svc} condrestart > /dev/null 2>&1 || :
     done
 fi
@@ -253,9 +260,11 @@ fi
 %{_bindir}/glance-replicator
 %{_initrddir}/openstack-glance-api
 %{_initrddir}/openstack-glance-registry
+%{_initrddir}/openstack-glance-scrubber
 %dir %{_datadir}/glance
 %{_datadir}/glance/openstack-glance-api.upstart
 %{_datadir}/glance/openstack-glance-registry.upstart
+%{_datadir}/glance/openstack-glance-scrubber.upstart
 %{_mandir}/man1/glance*.1.gz
 %dir %{_sysconfdir}/glance
 %config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api.conf
@@ -281,6 +290,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon May 13 2013 Pádraig Brady <P@draigBrady.com> 2013.1-3
+- Add the scrubber service for deferred image deletion
+
 * Mon May 13 2013 Pádraig Brady <P@draigBrady.com> 2013.1-2
 - Avoid issue with crypto compat patch (#906051)
 
