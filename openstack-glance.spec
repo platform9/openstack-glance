@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2013.1.2
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -21,6 +21,9 @@ Source4:          openstack-glance.logrotate
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
 # EPEL specific
+Patch100:         openstack-glance-newdeps.patch
+Patch101:         crypto.random.patch
+Patch102:         Avoid-NULLs-in-crypto-padding.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -107,6 +110,9 @@ This package contains documentation files for glance.
 
 %patch0001 -p1
 
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
 
 # Remove bundled egg-info
 rm -rf glance.egg-info
@@ -284,7 +290,7 @@ fi
 %doc doc/build/html
 
 %changelog
-* Thu Jun  6 2013 John Bresnahan <jbresnah@redhat.com> 2013.1.2
+* Thu Jun  6 2013 John Bresnahan <jbresnah@redhat.com> 2013.1.2-2
 - Update to 2013.1.2
 
 * Mon May 13 2013 Pádraig Brady <P@draigBrady.com> 2013.1-3
