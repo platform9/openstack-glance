@@ -1,12 +1,14 @@
+%global milestone 1
+
 Name:             openstack-glance
-Version:          2013.1.2
-Release:          2%{?dist}
+Version:          2013.2
+Release:          0.2.b%{milestone}%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          https://launchpad.net/glance/grizzly/2013.1/+download/glance-2013.1.2.tar.gz
+Source0:          https://launchpad.net/glance/havana/havana-1/+download/glance-2013.2.b1.tar.gz
 Source1:          openstack-glance-api.init
 Source100:        openstack-glance-api.upstart
 Source2:          openstack-glance-registry.init
@@ -16,7 +18,7 @@ Source300:        openstack-glance-scrubber.upstart
 Source4:          openstack-glance.logrotate
 
 #
-# patches_base=2013.1.2
+# patches_base=2013.2.b1
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 
@@ -106,7 +108,8 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}
+%setup -q -n glance-%{version}.b%{milestone}
+sed -i 's/%{version}.b%{milestone}/%{version}/' PKG-INFO
 
 %patch0001 -p1
 
@@ -290,8 +293,8 @@ fi
 %doc doc/build/html
 
 %changelog
-* Thu Jun  6 2013 John Bresnahan <jbresnah@redhat.com> 2013.1.2-2
-- Update to 2013.1.2
+* Fri Jun  7 2013 John Bresnahan <jbresnah@redhat.com> 2013.2.b1
+- Update to 2013.2.b1
 
 * Mon May 13 2013 Pádraig Brady <P@draigBrady.com> 2013.1-3
 - Add the scrubber service for deferred image deletion
