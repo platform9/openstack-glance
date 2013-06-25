@@ -108,8 +108,7 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}.b%{milestone}
-sed -i 's/%{version}.b%{milestone}/%{version}/' PKG-INFO
+%setup -q -n glance-%{version}
 %patch0001 -p1
 
 %patch100 -p1
@@ -292,6 +291,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Jun 24 2013 Dan Prince <dprince@redhat.com> 2013.2.b1-3
+- Drop milestone from version for upstream builds.
+
 * Fri Jun  7 2013 John Bresnahan <jbresnah@redhat.com> 2013.2.b1-3
 - reinstate EPEL specific patches
 
