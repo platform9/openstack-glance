@@ -121,6 +121,9 @@ sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/common/crypt.p
 # versioninfo is missing in f3 tarball
 echo %{version} > glance/versioninfo
 
+# Nuke requirements.txt (which requires specific versions, etc)
+echo "" > requirements.txt
+
 %build
 
 # Change the default config
@@ -291,6 +294,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Jul 2 2013 Dan Prince <dprince@redhat.com> 2013.2.b1-3
+- Nuke requirements.txt.
+
 * Mon Jun 24 2013 Dan Prince <dprince@redhat.com> 2013.2.b1-3
 - Drop milestone from version for upstream builds.
 
