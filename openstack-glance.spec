@@ -270,7 +270,7 @@ fi
 %doc doc/build/html
 
 %changelog
-* Tue Jul 30 Pádraig Brady <pbrady@redhat.com> 2013.1-0.3.g2
+* Tue Jul 30 2013 Pádraig Brady <pbrady@redhat.com> 2013.1-0.3.g2
 - Require python-netaddr and python-six (needed by oslo-common)
 
 * Wed May 1 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
