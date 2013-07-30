@@ -2,7 +2,7 @@
 
 Name:             openstack-glance
 Version:          2013.2
-Release:          0.3.b%{milestone}%{?dist}
+Release:          0.4.b%{milestone}%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -76,6 +76,8 @@ Requires:         python-crypto
 Requires:         pyxattr
 Requires:         python-swiftclient
 Requires:         python-oslo-config
+Requires:         python-netaddr
+Requires:         python-six
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -294,6 +296,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Jul 30 2013 Pádraig Brady <pbrady@redhat.com> 2013.2-0.4.b1
+- Require python-netaddr and python-six (needed by oslo-common)
+
 * Tue Jul 2 2013 Dan Prince <dprince@redhat.com> 2013.2.b1-3
 - Nuke requirements.txt.
 
