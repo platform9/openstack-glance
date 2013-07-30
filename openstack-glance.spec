@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2013.1
-Release:          0.2.g2%{?dist}
+Release:          0.3.g2%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -61,6 +61,8 @@ Requires:         python-crypto
 Requires:         pyxattr
 Requires:         python-swiftclient
 Requires:         python-oslo-config
+Requires:         python-netaddr
+Requires:         python-six
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -268,6 +270,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Tue Jul 30 Pádraig Brady <pbrady@redhat.com> 2013.1-0.3.g2
+- Require python-netaddr and python-six (needed by oslo-common)
+
 * Wed May 1 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
 - Add patch to remove auto deps.
 
