@@ -15,7 +15,6 @@ Source3:          openstack-glance.logrotate
 # patches_base=grizzly-2
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
-Patch0002: 0002-remove-auto-deps.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -102,7 +101,6 @@ This package contains documentation files for glance.
 %setup -q -n glance-%{version}
 
 %patch0001 -p1
-%patch0002 -p1
 
 # Remove bundled egg-info
 rm -rf glance.egg-info
@@ -270,6 +268,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Fri Aug 9 2013 Dan Prince <dprince@redhat.com> 2013.1-0.3.g2
+- Remove patch to drop install_requires from setup.py.
+
 * Tue Jul 30 2013 Pádraig Brady <pbrady@redhat.com> 2013.1-0.3.g2
 - Require python-netaddr and python-six (needed by oslo-common)
 
