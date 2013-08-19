@@ -1,6 +1,6 @@
 Name:             openstack-glance
 Version:          2013.1
-Release:          0.3.g2%{?dist}
+Release:          0.4.g2%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
@@ -62,6 +62,7 @@ Requires:         python-swiftclient
 Requires:         python-oslo-config
 Requires:         python-netaddr
 Requires:         python-six
+Requires:         python-cinderclient
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -268,6 +269,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Aug 19 2013 Derek Higgins <derekh@redhat.com> - 2013.1-0.4.g2
+- Require python-cinderclient (needed for new cinder backend)
+
 * Fri Aug 9 2013 Dan Prince <dprince@redhat.com> 2013.1-0.3.g2
 - Remove patch to drop install_requires from setup.py.
 
