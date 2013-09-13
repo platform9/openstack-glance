@@ -17,7 +17,7 @@ Source4:          openstack-glance.logrotate
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
 Patch0002: 0002-Remove-runtime-dep-on-python-pbr.patch
-Patch0003: 0003-Revert-use-oslo.sphinx-and-remove-local-copy-of-doc.patch
+#Patch0003: 0003-Revert-use-oslo.sphinx-and-remove-local-copy-of-doc.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -33,6 +33,7 @@ Requires:         python-glanceclient >= 1:0
 Requires:         openstack-utils
 BuildRequires:    openstack-utils
 BuildRequires:    python-pbr
+BuildRequires:    python-oslo-sphinx
 
 %description
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -102,11 +103,10 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}.b3
-sed -i 's/%{version}.b3/%{version}/' PKG-INFO
+%setup -q -n glance-%{version}
 %patch0001 -p1
 %patch0002 -p1
-%patch0003 -p1
+#%patch0003 -p1
 
 # Remove bundled egg-info
 rm -rf glance.egg-info
@@ -284,6 +284,10 @@ fi
 %doc doc/build/html
 
 %changelog
+* Mon Sep  9 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.8.b3
+- Drop b3 from release name.
+- Remove patch 0003 (which drops python-oslo-sphinx)
+
 * Mon Sep  9 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.8.b3
 - Update to version 2013.2.b3
 - Remove runtime dep on python pbr
