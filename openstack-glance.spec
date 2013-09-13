@@ -23,7 +23,7 @@ Patch0002: 0002-Use-updated-parallel-install-versions-of-epel-packag.patch
 Patch0003: 0003-avoid-the-uneeded-dependency-on-Crypto.Random.patch
 Patch0004: 0004-Avoid-NULLs-in-crypto-padding.patch
 Patch0005: 0005-Remove-runtime-dep-on-python-pbr.patch
-Patch0006: 0006-Revert-use-oslo.sphinx-and-remove-local-copy-of-doc.patch
+#Patch0006: 0006-Revert-use-oslo.sphinx-and-remove-local-copy-of-doc.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -35,6 +35,7 @@ BuildRequires:    python-routes1.12
 BuildRequires:    python-sqlalchemy0.7
 BuildRequires:    python-webob1.0
 BuildRequires:    python-pbr
+BuildRequires:    python-oslo-sphinx
 
 Requires(post):   chkconfig
 Requires(preun):  initscripts
@@ -109,14 +110,14 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}.b3
-sed -i 's/%{version}.b3/%{version}/' PKG-INFO
+%setup -q -n glance-%{version}
+#sed -i 's/%{version}.b3/%{version}/' PKG-INFO
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 %patch0005 -p1
-%patch0006 -p1
+#%patch0006 -p1
 
 
 # Remove bundled egg-info
@@ -310,6 +311,10 @@ fi
 %doc doc/build/html
 
 %changelog
+* Fri Sep 13 2013 Dan Prince <dprince@redhat.com> 2013.2.b3
+- Drop b3 from release name.
+- Remove patch 0003 (which drops python-oslo-sphinx)
+
 * Mon Sep  9 2013 John Bresnahan <jbresnah@redhat.com> 2013.2.b3
 - Update to 2013.2.b3
 - Remove runtime dep on python pbr
