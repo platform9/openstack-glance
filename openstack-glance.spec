@@ -1,20 +1,23 @@
 Name:             openstack-glance
-Version:          2013.1
-Release:          0.4.g2%{?dist}
+Version:          2013.2
+Release:          0.8.b3%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          https://launchpad.net/glance/grizzly/grizzly-2/+download/glance-2013.1~g2.tar.gz
+Source0:          https://launchpad.net/glance/havana/havana-3/+download/glance-2013.2.b3.tar.gz
 Source1:          openstack-glance-api.service
 Source2:          openstack-glance-registry.service
-Source3:          openstack-glance.logrotate
+Source3:          openstack-glance-scrubber.service
+Source4:          openstack-glance.logrotate
 
 #
-# patches_base=grizzly-2
+# patches_base=2013.2.b3
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
+Patch0002: 0002-Remove-runtime-dep-on-python-pbr.patch
+Patch0003: 0003-Revert-use-oslo.sphinx-and-remove-local-copy-of-doc.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -29,6 +32,7 @@ Requires:         python-glance = %{version}-%{release}
 Requires:         python-glanceclient >= 1:0
 Requires:         openstack-utils
 BuildRequires:    openstack-utils
+BuildRequires:    python-pbr
 
 %description
 OpenStack Image Service (code-named Glance) provides discovery, registration,
@@ -59,10 +63,9 @@ Requires:         python-webob
 Requires:         python-crypto
 Requires:         pyxattr
 Requires:         python-swiftclient
-Requires:         python-oslo-config
-Requires:         python-netaddr
-Requires:         python-six
 Requires:         python-cinderclient
+Requires:         python-keystoneclient
+Requires:         python-oslo-config
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -99,15 +102,21 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}
-
+%setup -q -n glance-%{version}.b3
+sed -i 's/%{version}.b3/%{version}/' PKG-INFO
 %patch0001 -p1
+%patch0002 -p1
+%patch0003 -p1
 
 # Remove bundled egg-info
 rm -rf glance.egg-info
 sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/common/crypt.py glance/db/sqlalchemy/migrate_repo/manage.py
 # versioninfo is missing in f3 tarball
 echo %{version} > glance/versioninfo
+
+# Remove the requirements file so that pbr hooks don't add it
+# to distutils requiers_dist config
+rm -rf {test-,}requirements.txt tools/{pip,test}-requires
 
 %build
 
@@ -142,13 +151,14 @@ openstack-config --set etc/glance-registry.conf keystone_authtoken auth_host 127
 openstack-config --set etc/glance-registry.conf keystone_authtoken auth_port 35357
 openstack-config --set etc/glance-registry.conf keystone_authtoken auth_protocol http
 
+
 %{__python} setup.py build
 
 %install
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 
 # Delete tests
-rm -fr %{buildroot}%{python_sitelib}/tests
+rm -fr %{buildroot}%{python_sitelib}/glance/tests
 
 # Drop old glance CLI it has been deprecated
 # and replaced glanceclient
@@ -188,9 +198,10 @@ install -p -D -m 640 etc/schema-image.json %{buildroot}%{_sysconfdir}/glance/sch
 # Initscripts
 install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/openstack-glance-api.service
 install -p -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/openstack-glance-registry.service
+install -p -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/openstack-glance-scrubber.service
 
 # Logrotate config
-install -p -D -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/openstack-glance
+install -p -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/openstack-glance
 
 # Install pid directory
 install -d -m 755 %{buildroot}%{_localstatedir}/run/glance
@@ -217,8 +228,10 @@ if [ $1 -eq 0 ] ; then
     # Package removal, not upgrade
     /bin/systemctl --no-reload disable openstack-glance-api.service > /dev/null 2>&1 || :
     /bin/systemctl --no-reload disable openstack-glance-registry.service > /dev/null 2>&1 || :
+    /bin/systemctl --no-reload disable openstack-glance-scrubber.service > /dev/null 2>&1 || :
     /bin/systemctl stop openstack-glance-api.service > /dev/null 2>&1 || :
     /bin/systemctl stop openstack-glance-registry.service > /dev/null 2>&1 || :
+    /bin/systemctl stop openstack-glance-scrubber.service > /dev/null 2>&1 || :
 fi
 
 %postun
@@ -227,6 +240,7 @@ if [ $1 -ge 1 ] ; then
     # Package upgrade, not uninstall
     /bin/systemctl try-restart openstack-glance-api.service >/dev/null 2>&1 || :
     /bin/systemctl try-restart openstack-glance-registry.service >/dev/null 2>&1 || :
+    /bin/systemctl try-restart openstack-glance-scrubber.service >/dev/null 2>&1 || :
 fi
 
 %files
@@ -244,6 +258,7 @@ fi
 
 %{_unitdir}/openstack-glance-api.service
 %{_unitdir}/openstack-glance-registry.service
+%{_unitdir}/openstack-glance-scrubber.service
 %{_mandir}/man1/glance*.1.gz
 %dir %{_sysconfdir}/glance
 %config(noreplace) %attr(-, root, glance) %{_sysconfdir}/glance/glance-api.conf
@@ -262,27 +277,61 @@ fi
 %files -n python-glance
 %doc README.rst
 %{python_sitelib}/glance
-%{python_sitelib}/glance-%{version}-*.egg-info
+%{python_sitelib}/glance-%{version}*.egg-info
 
 
 %files doc
 %doc doc/build/html
 
 %changelog
-* Mon Aug 19 2013 Derek Higgins <derekh@redhat.com> - 2013.1-0.4.g2
-- Require python-cinderclient (needed for new cinder backend)
+* Mon Sep  9 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.8.b3
+- Update to version 2013.2.b3
+- Remove runtime dep on python pbr
+- Revert use oslo.sphinx and remove local copy of doc
 
-* Fri Aug 9 2013 Dan Prince <dprince@redhat.com> 2013.1-0.3.g2
-- Remove patch to drop install_requires from setup.py.
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2013.2-0.7.b2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-* Tue Jul 30 2013 Pádraig Brady <pbrady@redhat.com> 2013.1-0.3.g2
-- Require python-netaddr and python-six (needed by oslo-common)
+* Tue Jul 23 2013 Pádraig Brady <pbrady@redhat.com> 2013.2-0.6.b2
+- Update to Havana milestone 2
+- Depend on python-keystoneclient for auth_token middleware
+- Remove tests from the distribution
 
-* Wed May 1 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
-- Add patch to remove auto deps.
+* Fri Jun  7 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.3.b1
+- Don't access the net while building docs
 
-* Tue Feb 19 2013 Dan Prince <dprince@redhat.com> 2013.1-0.2.g2
-- Add dependency on python-oslo-config.
+* Thu Jun  6 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.1.b1
+- Update to version 2013.2.b1
+
+* Thu Jun  6 2013 John Bresnahan <jbresnah@redhat.com> 2013.1.2
+- Update to version 2013.1.2
+
+* Mon May 13 2013 Pádraig Brady <pbrady@redhat.com> 2013.1-2
+- Add the scrubber service for deferred image deletion
+
+* Mon Apr 08 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-1
+- Update to Grizzly final
+
+* Tue Apr  2 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.9.rc2
+- Update to Grizzly RC2
+
+* Tue Apr  2 2013 Pádraig Brady <pbrady@redhat.com> 2013.1-0.8.rc1
+- Adjust to support sqlalchemy-0.8.0
+
+* Tue Mar 22 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.7.rc1
+- Update to Grizzly RC1
+
+* Tue Feb 26 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.6.g3
+- Fix dep issues introduced by the Grizzly-3 update
+
+* Mon Feb 25 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.5.g3
+- Update to Grizzlt milestone 3
+
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2013.1-0.4.g2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Tue Jan 29 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.3.g2
+- Fix backend password leak in Glance error message (CVE-2013-0212)
 
 * Fri Jan 11 2013 Nikola Đipanov <ndipanov@redhat.com> 2013.1-0.2.g2
 - Update to Grizzlt milestone 2
