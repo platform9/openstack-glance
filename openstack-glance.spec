@@ -284,7 +284,7 @@ fi
 %doc doc/build/html
 
 %changelog
-* Mon Sep  9 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.8.b3
+* Fri Sep 13 2013 Dan Prince <dprince@redhat.com> 2013.2-0.8.b3
 - Drop b3 from release name.
 - Remove patch 0003 (which drops python-oslo-sphinx)
 
