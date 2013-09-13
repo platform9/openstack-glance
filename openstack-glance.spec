@@ -1,14 +1,12 @@
-%global milestone 1
-
 Name:             openstack-glance
 Version:          2013.2
-Release:          0.4.b%{milestone}%{?dist}
+Release:          0.7.b3%{?dist}
 Summary:          OpenStack Image Service
 
 Group:            Applications/System
 License:          ASL 2.0
 URL:              http://glance.openstack.org
-Source0:          https://launchpad.net/glance/havana/havana-1/+download/glance-2013.2.b1.tar.gz
+Source0:          https://launchpad.net/glance/havana/havana-3/+download/glance-2013.2.b3.tar.gz
 Source1:          openstack-glance-api.init
 Source100:        openstack-glance-api.upstart
 Source2:          openstack-glance-registry.init
@@ -18,14 +16,14 @@ Source300:        openstack-glance-scrubber.upstart
 Source4:          openstack-glance.logrotate
 
 #
-# patches_base=2013.2.b1
+# patches_base=2013.2.b3
 #
 Patch0001: 0001-Don-t-access-the-net-while-building-docs.patch
-
-# EPEL specific
-Patch100:         openstack-glance-newdeps.patch
-Patch101:         crypto.random.patch
-Patch102:         Avoid-NULLs-in-crypto-padding.patch
+Patch0002: 0002-Use-updated-parallel-install-versions-of-epel-packag.patch
+Patch0003: 0003-avoid-the-uneeded-dependency-on-Crypto.Random.patch
+Patch0004: 0004-Avoid-NULLs-in-crypto-padding.patch
+Patch0005: 0005-Remove-runtime-dep-on-python-pbr.patch
+Patch0006: 0006-Revert-use-oslo.sphinx-and-remove-local-copy-of-doc.patch
 
 BuildArch:        noarch
 BuildRequires:    python2-devel
@@ -36,6 +34,7 @@ BuildRequires:    python-paste-deploy1.5
 BuildRequires:    python-routes1.12
 BuildRequires:    python-sqlalchemy0.7
 BuildRequires:    python-webob1.0
+BuildRequires:    python-pbr
 
 Requires(post):   chkconfig
 Requires(preun):  initscripts
@@ -75,9 +74,9 @@ Requires:         python-webob1.0
 Requires:         python-crypto
 Requires:         pyxattr
 Requires:         python-swiftclient
+Requires:         python-cinderclient
+Requires:         python-keystoneclient
 Requires:         python-oslo-config
-Requires:         python-netaddr
-Requires:         python-six
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -110,12 +109,15 @@ and delivery services for virtual disk images.
 This package contains documentation files for glance.
 
 %prep
-%setup -q -n glance-%{version}
+%setup -q -n glance-%{version}.b3
+sed -i 's/%{version}.b3/%{version}/' PKG-INFO
 %patch0001 -p1
+%patch0002 -p1
+%patch0003 -p1
+%patch0004 -p1
+%patch0005 -p1
+%patch0006 -p1
 
-%patch100 -p1
-%patch101 -p1
-%patch102 -p1
 
 # Remove bundled egg-info
 rm -rf glance.egg-info
@@ -123,12 +125,24 @@ sed -i '/\/usr\/bin\/env python/d' glance/common/config.py glance/common/crypt.p
 # versioninfo is missing in f3 tarball
 echo %{version} > glance/versioninfo
 
-# Nuke requirements.txt (which requires specific versions, etc)
-echo "" > requirements.txt
+sed -i '/setuptools_git/d' setup.py
+sed -i s/REDHATGLANCEVERSION/%{version}/ glance/version.py
+sed -i s/REDHATGLANCERELEASE/%{release}/ glance/version.py
+
+# Remove the requirements file so that pbr hooks don't add it
+# to distutils requiers_dist config
+rm -rf {test-,}requirements.txt tools/{pip,test}-requires
 
 %build
 
 # Change the default config
+openstack-config --set etc/glance-api.conf DEFAULT debug False
+openstack-config --set etc/glance-api.conf DEFAULT verbose True
+openstack-config --set etc/glance-registry.conf DEFAULT debug False
+openstack-config --set etc/glance-registry.conf DEFAULT verbose True
+openstack-config --set etc/glance-scrubber.conf DEFAULT debug False
+openstack-config --set etc/glance-scrubber.conf DEFAULT verbose True
+
 openstack-config --set etc/glance-registry.conf DEFAULT sql_connection mysql://glance:glance@localhost/glance
 openstack-config --set etc/glance-api.conf DEFAULT sql_connection mysql://glance:glance@localhost/glance
 # Move authtoken configuration out of paste.ini
@@ -165,7 +179,7 @@ openstack-config --set etc/glance-registry.conf keystone_authtoken auth_protocol
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 
 # Delete tests
-rm -fr %{buildroot}%{python_sitelib}/tests
+rm -fr %{buildroot}%{python_sitelib}/glance/tests
 
 # Drop old glance CLI it has been deprecated
 # and replaced glanceclient
@@ -296,14 +310,18 @@ fi
 %doc doc/build/html
 
 %changelog
-* Tue Jul 30 2013 Pádraig Brady <pbrady@redhat.com> 2013.2-0.4.b1
-- Require python-netaddr and python-six (needed by oslo-common)
+* Mon Sep  9 2013 John Bresnahan <jbresnah@redhat.com> 2013.2.b3
+- Update to 2013.2.b3
+- Remove runtime dep on python pbr
+- Revert use oslo.sphinx and remove local copy of doc
 
-* Tue Jul 2 2013 Dan Prince <dprince@redhat.com> 2013.2.b1-3
-- Nuke requirements.txt.
+* Tue Jul 23 2013 John Bresnahan <jbresnah@redhat.com> 2013.2-0.6.b2
+- Do not log DEBUG by default
+- Do not distribute tests
 
-* Mon Jun 24 2013 Dan Prince <dprince@redhat.com> 2013.2.b1-3
-- Drop milestone from version for upstream builds.
+* Tue Jul 23 2013 Pádraig Brady <pbrady@redhat.com> 2013.2-0.5.b2
+- Update to Havana milestone 2
+- Depend on python-keystoneclient for auth_token middleware
 
 * Fri Jun  7 2013 John Bresnahan <jbresnah@redhat.com> 2013.2.b1-3
 - reinstate EPEL specific patches

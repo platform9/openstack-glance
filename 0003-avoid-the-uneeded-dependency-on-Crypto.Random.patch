@@ -1,3 +1,8 @@
+From f11475fdd723c9b08c5efc5d4412f2fa2940df00 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Tue, 23 Jul 2013 12:19:45 +0100
+Subject: [PATCH] avoid the uneeded dependency on Crypto.Random
+
 Crypto.Random was added in python-crypto-2.1.0 to replace
 the problematic randpool in 2.0.1: http://www.pycrypto.org/randpool-broken
 However on Linux os.urandom() should be fine to set IV.
@@ -6,11 +11,15 @@ I'm not sure it's necessary to pad with random bytes,
 but I'm leaving that as is for now:
 http://www.codekoala.com/blog/2009/aes-encryption-python-using-pycrypto/#comment-25921785
 http://eli.thegreenplace.net/2010/06/25/aes-encryption-of-files-in-python-with-pycrypto/
+---
+ glance/common/crypt.py | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff -Naur glance-2012.1.orig/glance/common/crypt.py glance-2012.1/glance/common/crypt.py
---- glance-2012.1.orig/glance/common/crypt.py	2012-03-30 13:12:40.000000000 +0000
-+++ glance-2012.1/glance/common/crypt.py	2012-04-09 01:46:38.244937150 +0000
-@@ -21,10 +21,7 @@
+diff --git a/glance/common/crypt.py b/glance/common/crypt.py
+index ee5f2dd..ef6496b 100644
+--- a/glance/common/crypt.py
++++ b/glance/common/crypt.py
+@@ -21,10 +21,7 @@ Routines for URL-safe encrypting/decrypting
  """
  
  import base64
@@ -21,7 +30,7 @@ diff -Naur glance-2012.1.orig/glance/common/crypt.py glance-2012.1/glance/common
  
  
  def urlsafe_encrypt(key, plaintext, blocksize=16):
-@@ -41,13 +38,12 @@
+@@ -41,13 +38,12 @@ def urlsafe_encrypt(key, plaintext, blocksize=16):
          Pads text to be encrypted
          """
          pad_length = (blocksize - len(text) % blocksize)

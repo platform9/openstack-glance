@@ -1,3 +1,19 @@
+From 22ca4cbf6e12fc210ad7c3ec2e4afdc5f2b4a29d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Tue, 23 Jul 2013 12:18:26 +0100
+Subject: [PATCH] Use updated parallel install versions of epel package
+
+Use sqlalchemy >= 0.6.3 WebOb >= 1.0 Routes >= 1.12.3 PasteDeploy >= 1.5.0
+and depend on the parallel installable
+versions of these packages to satisfy those requirements.
+
+Delve into pkg_resources a little to get it to modify sys.path,
+so that our parallel installed egg takes precedence over the
+system default module versions.
+---
+ glance/__init__.py | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
 diff --git a/glance/__init__.py b/glance/__init__.py
 index b606957..dd75292 100644
 --- a/glance/__init__.py

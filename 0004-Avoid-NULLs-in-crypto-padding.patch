@@ -1,4 +1,4 @@
-From 4458d6af24ba1e9dcb72b7b15b99cba9dce6b4ca Mon Sep 17 00:00:00 2001
+From 27dcae6a1f9122c21fb0e71e1ddaed1d1ba1d84f Mon Sep 17 00:00:00 2001
 From: Eoghan Glynn <eglynn@redhat.com>
 Date: Wed, 30 Jan 2013 17:43:52 +0000
 Subject: [PATCH] Avoid NULLs in crypto padding.
