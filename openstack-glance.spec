@@ -67,6 +67,7 @@ Requires:         python-swiftclient
 Requires:         python-cinderclient
 Requires:         python-keystoneclient
 Requires:         python-oslo-config
+Requires:         sheepdog
 
 #test deps: python-mox python-nose python-requests
 #test and optional store:
@@ -284,6 +285,9 @@ fi
 %doc doc/build/html
 
 %changelog
+* Sun Sep 15 2013 Dan Prince <dprince@redhat.com> 2013.2-0.8.b3
+- Add dependency on sheepdog.
+
 * Fri Sep 13 2013 Dan Prince <dprince@redhat.com> 2013.2-0.8.b3
 - Drop b3 from release name.
 - Remove patch 0003 (which drops python-oslo-sphinx)
